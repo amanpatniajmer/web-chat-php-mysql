@@ -19,7 +19,9 @@ switch ($_POST['submit']) {
             /* free result set */
             mysqli_free_result($result);
         } else {
-            echo "Invalid User";
+            $json=['name'=>'','message'=>'Invalid User'];
+                echo json_encode($json);
+            
         }
         break;
 

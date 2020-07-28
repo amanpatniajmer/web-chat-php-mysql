@@ -32,34 +32,36 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
         background-color: white;
         color: white;
         max-height: 100vh;
-        box-shadow: 2px 0px 21px 0px rgba(0, 0, 0, 0.33);
-        border-radius:15px 15px 15px 15px;
+
+        border-radius: 0px 0px 15px 15px;
     }
 
     .header {
         padding: 15px;
-        background-color: rgb(119, 64, 207);
-        border-radius:15px 15px 0px 0px;
+        background-color: rgba(119, 64, 207, 1.0);
+        border-radius: 15px 0px 0px 0px;
+        box-shadow: 0px 0px 21px 0px rgba(0, 0, 0, 0.33);
     }
 
     #chatPanel {
         width: inherit;
-        background-color: rgba(0, 0, 0, 0.33);
+        background-color: rgba(0, 0, 0, 0.61);
         height: calc(100vh - 200px);
         display: flex;
         align-items: flex-end;
         flex-flow: column;
         padding: 5px;
         overflow: auto;
-        
+
     }
 
     #input_div {
-        border: black solid 1px;
+
         display: flex;
         flex-flow: column;
         width: 100%;
         border-radius: 0px 0px 15px 15px;
+        box-shadow: 2px 10px 21px 0px rgba(0, 0, 0, 0.33);
     }
 
     input {
@@ -70,9 +72,17 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
         border-radius: 0px 0px 15px 15px;
     }
 
-    input[type=text] {
-        
+    input[type=text],
+    textarea,
+    textarea:focus {
+        height: 50px;
+        resize: none;
+        outline: none;
+        border: none;
+        word-break: break-all;
+        overflow: auto;
         width: 88%;
+        border-radius: 0px 0px 15px 15px;
     }
 
     input[type=text]:focus {
@@ -80,7 +90,7 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
         border: none;
     }
 
-    
+
     #msg_form {
         margin: 0;
     }
@@ -111,11 +121,12 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
         align-self: flex-start;
         padding: 5px;
         border-radius: 8px;
-        background-color: lightgreen;
+        background-color: rgb(200 130 247 / 70%);
         color: black;
         margin-top: 5px;
-        box-shadow: 2px 10px 21px 0px rgba(0, 0, 0, 0.33);
+        box-shadow: 5px 8px 6px 1px rgba(0, 0, 0, 0.33);
 
+        border: grey solid 1px;
     }
 
     .time {
@@ -125,48 +136,154 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
         font-size: 10px;
     }
 
-    i {
-        
-        color: black;
+    i.fa-paper-plane {
+        color: rgba(119, 64, 207, 0.8);
     }
-    button[type=submit]{
+
+    button[type=submit] {
         font-size: 25px;
-        align-self: flex-end;
+        float: right;
+        margin: 5px;
         border-radius: 100%;
         outline: none;
-        border:none;
+        border: none;
     }
-    #secret{
-        background-color: rgba(255,255,255,1);
+
+    #secret {
+        background-color: rgba(255, 255, 255, 1);
         display: none;
         height: 100vh;
         width: 100vw;
         position: fixed;
     }
-    .options{
+
+    .options {
+        align-self: flex-end;
         float: right;
-        border:none;
+        border: none;
+        padding: 8px;
         border-radius: 15px 15px 15px 15px;
-        margin: 5px;
         font-size: 15px;
         cursor: pointer;
+        box-shadow: 2px 10px 21px 0px rgba(0, 0, 0, 0.33);
+    }
+
+    #pre-header {
+        display: flex;
+        flex-flow: column;
+    }
+
+    #logout {
+        border-radius: 15px 15px 0px 0px;
+        padding: 5px;
+        background-color: rgba(0, 0, 0, 0.69);
+        color: white;
+        border: black solid 1px
+    }
+
+    .modal {
+        display: none;
+        width: 100vw;
+        height: 100vh;
+        position: fixed;
+        background-color: rgba(0, 0, 0, 0.33);
+        text-align: center;
+    }
+
+    .modal-content {
+        max-width: 100vw;
+        margin: auto;
+        width: 350px;
+        max-height: 100vh;
+        overflow: auto;
+        background-color: white;
+        border-radius: 0px 0px 15px 15px;
+    }
+
+    .close {
+        border-radius: 0px 0px 15px 15px;
+        margin: auto;
+        background-color: royalblue;
+        color: white;
+        display: inline-block;
+        padding-left: 10px;
+        padding-right: 10px;
+        cursor: pointer;
+    }
+
+    .list {
+        border: #ececec solid 1px;
+    }
+
+    .listOptions {
+        text-align: left;
+        padding: 5px;
+        border: #ececec solid 1px;
+        height: 50px;
+    }
+
+    .listOptions:hover {
+        background-color: #ececec;
+    }
+
+    .listOptions.selected {
+        background-color: royalblue !important;
+    }
+
+    @keyframes down {
+        from {
+            height: 0px;
+        }
+
+        to {
+            height: 300px;
+        }
+    }
+
+    @keyframes up {
+        from {
+            height: 300px;
+        }
+
+        to {
+            height: 0px;
+        }
     }
 </style>
 
 <body>
+    <div class="modal" id="otherChats_div">
+        <div class="modal-content" id="otherChats-content">
+            Other Chats
+            <div class="list" id="list">
+                <div class="listOptions">
+                    <i class=" fa fa-user-circle"></i>
+                    <span class='username'>UserName</span>
+                </div>
+                <div class="listOptions">
+                    <i class=" fa fa-user-circle"></i>
+                    <span class='username'>aanchaljain123</span>
+                </div>
+            </div>
+            </br></br></br></br></br></br></br>
+        </div>
+        <div class="close" id="close"><i style="color:white; font-size: 25px;" class="fa fa-chevron-up"></i></div>
+    </div>
     <div id="secret"></div>
     <h1 class="center">Welcome <span class='name'>Name</span></h1>
-    
+
     <div class="container">
-    
+        <div id="pre-header">
+            <button id="logout" class="options"><a href="logout.php" style="color:white"> Logout &times; </a></button>
+        </div>
         <div class="header">
-                <i class=" fa fa-user-circle"></i>
-            <span class='username'>UserName</span>
-            <a href=""><button id="otherChats" class="options"> Other Chats</button></a>
-            <a href="logout.php"><button id="logout" class="options"> Logout</button></a>
-            
-            
-            
+            <i class=" fa fa-user-circle"></i>
+            <span class='user2'>User2</span>
+            <button id="otherChats" class="options"> Other Chats</button>
+
+
+
+
         </div>
         <div id="chatPanel">
             <br /><br /><br /><br />
@@ -219,72 +336,115 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
         </div>
         <div id="input_div">
             <form id="msg_form" method="POST" action="./send.php">
-                <input type="text" name="msg" id="msg" autofocus autocomplete="off" placeholder="Type your msg">
-<!--                 <input type="submit" name="submit" id="send" value="Send"> -->
+                <!-- <input type="text" name="msg" id="msg" autofocus autocomplete="off" placeholder="Type your msg"> -->
+                <textarea name="msg" id="msg" autofocus autocomplete="off" placeholder="Type your msg"></textarea>
+                <!--                 <input type="submit" name="submit" id="send" value="Send"> -->
                 <button type="submit" name="submit" id="send" value="Send"><i class="fa fa-paper-plane"></i></button>
             </form>
         </div>
 
     </div>
     <button id="add">Class</button>
-    <div id="content"></div>
     <script>
-        
-        
-        window.onload=function(){
-            
-            window.addEventListener('keydown',function(e){
-            if(e.which==17 || e.key=='17'){
-                sessionStorage.setItem('secret',1);
-            document.getElementById('secret').style.display='block';
-            }
-        });
-        window.addEventListener('keydown',function(e){
-            if(e.which==16){
-                sessionStorage.setItem('secret',0);
-            document.getElementById('secret').style.display='none';
-            }
+        var modal = document.getElementById('otherChats_div');
+        Array.from(document.getElementsByClassName('listOptions')).forEach(function(element) {
+            element.addEventListener('click', function(e) {
+                var user2 = element.lastElementChild.innerText;
+
+                Array.from(document.getElementById('list').children).forEach(function(el) {
+                    if (el.lastElementChild.innerText == localStorage.getItem('user2')) {
+                        el.className = "listOptions";
+                    }
+                })
+                element.classList.add('selected');
+                localStorage.setItem('user2', user2);
+                modal.style.display = "none";
+                Array.from(document.getElementsByClassName('user2')).forEach(function(element) {
+                    element.innerHTML = localStorage.getItem('user2');
+                })
+                
+                table_name().then(function(x){
+                    var json=JSON.parse(x.responseText);
+                    console.log(json['table_name']);
+                    load_msgs(json['table_name']).then(function(xhr){
+                        var json_msgs=JSON.parse(xhr.responseText);
+                        
+                        for(var i=0;i<json_msgs.length;i++){
+                            console.log(json_msgs[i]);
+                            
+                        }
+                    })
+                });
+            })
         })
-        /* if(sessionStorage.getItem('secret')==1){ 
-            var evt=new KeyboardEvent('keydown',{ 'key': 17, 'which': 17 });
-            document.dispatchEvent(evt);
-            console.log(evt);
-            } */
+
+        window.addEventListener('click', function(e) {
+            if (e.target == modal)
+                modal.style.display = "none";
+        })
+        document.getElementById('close').addEventListener('click', function() {
+
+            document.getElementById('list').style.animation = "up 300ms ease"
+            document.getElementById('list').style.height = "0px";
+            setTimeout(function() {
+                document.getElementById('otherChats_div').style.display = 'none';
+            }, 300);
+        })
+        document.getElementById('otherChats').addEventListener('click', function() {
+            var od = document.getElementById('otherChats_div');
+            od.style.display = 'block';
+            document.getElementById('list').style.animation = "down 500ms ease";
+            document.getElementById('list').style.height = "300px";
+
+        })
+        window.onload = function() {
+
+            window.addEventListener('keydown', function(e) {
+                if (e.which == 17 || e.key == '17') {
+                    localStorage.setItem('secret', 1);
+                    document.getElementById('secret').style.display = 'block';
+                } else if (e.which == 16) {
+                    localStorage.setItem('secret', 0);
+                    document.getElementById('secret').style.display = 'none';
+                } else if (e.which == 13 && e.shiftKey == false) {
+                    var ta = document.getElementById('msg');
+                    if (e.target == ta) {
+                        document.getElementById('send').click();
+                    }
+                }
+            });
+            /* if(localStorage.getItem('secret')==1){ 
+                var evt=new KeyboardEvent('keydown',{ 'key': 17, 'which': 17 });
+                document.dispatchEvent(evt);
+                console.log(evt);
+                } */
         }
-        
-        Array.from(document.getElementsByClassName('name')).forEach(function(element){
-            element.innerHTML=localStorage.getItem('name');
+
+        Array.from(document.getElementsByClassName('name')).forEach(function(element) {
+            element.innerHTML = localStorage.getItem('name');
         })
-        Array.from(document.getElementsByClassName('username')).forEach(function(element){
-            element.innerHTML=localStorage.getItem('username');
-        })
-        document.getElementById('msg').onchange=function(){
-            document.getElementById('msg').setAttribute('placeholder','');
+        document.getElementById('msg').onchange = function() {
+            document.getElementById('msg').setAttribute('placeholder', '');
         }
         var chatPanel = document.getElementById('chatPanel');
         chatPanel.scrollTop = chatPanel.scrollHeight;
-        var content = document.getElementById('content');
-        setInterval(function() {
-            var xhr = new XMLHttpRequest();
-
-            xhr.onreadystatechange = function() {
-                if (xhr.status >= 200)
-                    content.innerHTML = xhr.responseText;
-            }
-            xhr.open('get', './aj.txt');
-            xhr.send();
-        }, 100000);
         document.getElementById('add').addEventListener('click', function() {
             Array.from(document.getElementsByClassName('yourmsg')).forEach(function(element) {
                 element.className = "mymsg";
             })
         })
 
-        function send_msg(msg,d) {
+        /* 
+                var ws=new WebSocket('ws://localhost/chat/send.php')
+                console.log(ws);
+                ws.onopen=function(){console.log('Connection Established')}; */
+
+
+        function send_msg(msg, d) {
             var xhr = new XMLHttpRequest();
             var formdata = new FormData();
             formdata.append('msg', msg);
-            formdata.append('day',d.getDate());
+            formdata.append('day', d.getDate());
             formdata.append('month', d.getMonth());
             formdata.append('year', d.getFullYear());
             formdata.append('h', d.getHours());
@@ -302,18 +462,36 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
                 xhr.send(formdata);
             })
         }
-
-        function load_msgs() {
-            var xhr = new XMLHttpRequest();
-            return new Promise(function(resolve) {
-                xhr.onreadystatechange = function() {
+        
+        function table_name(){
+            var xhr= new XMLHttpRequest();
+            return new Promise(function(resolve){
+                var formdata=new FormData();
+                formdata.append('user1',localStorage.getItem('username'));
+                formdata.append('user2',localStorage.getItem('user2'));
+                xhr.onreadystatechange=function(){
                     if (xhr.status >= 200 & xhr.status < 300 & xhr.readyState == 4) {
                         resolve(xhr);
                         console.log(xhr.responseText);
                     }
                 }
-                xhr.open('post', './getAll.php');
-                xhr.send();
+                xhr.open('post','./table_name.php');
+                xhr.send(formdata);
+            })
+        }
+        function load_msgs(tn) {
+            var xhr = new XMLHttpRequest();
+            return new Promise(function(resolve) {
+                var formdata=new FormData();
+                formdata.append('table_name',tn);
+                xhr.onreadystatechange = function() {
+                    if (xhr.status >= 200 & xhr.status < 300 & xhr.readyState == 4) {
+                        resolve(xhr);
+                        //console.log(xhr.responseText);
+                    }
+                }
+                xhr.open('post', './load_msgs.php');
+                xhr.send(formdata);
             })
         }
 
@@ -334,9 +512,9 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
             chatPanel.append(new_msg);
             chatPanel.scrollTop = chatPanel.scrollHeight;
             console.log(new_msg);
-            send_msg(msg,d).then(function() {
+            send_msg(msg, d).then(function() {
                 document.getElementById('msg').value = '';
-                document.getElementById('msg').setAttribute('placeholder','Type your msg');
+                document.getElementById('msg').setAttribute('placeholder', 'Type your msg');
                 //load_msgs();
             })
 
@@ -345,20 +523,25 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
         form.onsubmit = function() {
             return false;
         }
-        setInterval(function(){authenticate() .then(function(xhr){
-                if(xhr.responseText=="Invalid User"){window.location.href="index.php";}
-            })},5000);
+        setInterval(function() {
+            authenticate().then(function(xhr) {
+                if (xhr.responseText == "Invalid User") {
+                    window.location.href = "login.php";
+                }
+            })
+        }, 5000);
+
         function authenticate() {
             var xhr = new XMLHttpRequest();
             return new Promise(function(resolve) {
-                var formdata= new FormData();
-                formdata.append('submit','check');
+                var formdata = new FormData();
+                formdata.append('submit', 'check');
                 console.log(formdata);
                 xhr.onreadystatechange = function() {
                     if (xhr.status >= 200 & xhr.status < 300 & xhr.readyState == 4) {
                         resolve(xhr);
                         console.log(xhr.responseText);
-                        
+
                     }
                 }
                 xhr.open('post', './validate_login.php');
