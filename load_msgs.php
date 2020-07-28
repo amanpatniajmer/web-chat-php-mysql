@@ -1,6 +1,6 @@
 <?php
     include 'db.php';
-    $query="SELECT * FROM ".$_POST['table_name'];
+    $query="SELECT * FROM ".$_POST['table_name']." ORDER BY year ASC, month ASC, day ASC, hour ASC, min ASC, sec ASC";
     if ($result = mysqli_query($db, $query)) {
 
         /* fetch associative array */

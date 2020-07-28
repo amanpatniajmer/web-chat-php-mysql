@@ -11,8 +11,7 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-    </link>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
 </head>
 <style>
     * {
@@ -137,7 +136,7 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
     }
 
     i.fa-paper-plane {
-        color: rgba(119, 64, 207, 0.8);
+        color: rgba(119, 64, 207, 1.0);
     }
 
     button[type=submit] {
@@ -219,7 +218,9 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
         text-align: left;
         padding: 5px;
         border: #ececec solid 1px;
-        height: 50px;
+        height: 40px;
+        font-size: 18px;
+        cursor: default;
     }
 
     .listOptions:hover {
@@ -257,28 +258,24 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
             Other Chats
             <div class="list" id="list">
                 <div class="listOptions">
-                    <i class=" fa fa-user-circle"></i>
-                    <span class='username'>UserName</span>
-                </div>
-                <div class="listOptions">
-                    <i class=" fa fa-user-circle"></i>
-                    <span class='username'>aanchaljain123</span>
+                    <i class=" fa fa-user-circle fa-2x"></i>
+                    <span class="user2">Usernames</span>
                 </div>
             </div>
-            </br></br></br></br></br></br></br>
+            <br /><br /><br /><br /><br /><br /><br />
         </div>
         <div class="close" id="close"><i style="color:white; font-size: 25px;" class="fa fa-chevron-up"></i></div>
     </div>
     <div id="secret"></div>
-    <h1 class="center">Welcome <span class='name'>Name</span></h1>
+    <h1 class="center">Welcome <span class="name">Name</span></h1>
 
     <div class="container">
         <div id="pre-header">
             <button id="logout" class="options"><a href="logout.php" style="color:white"> Logout &times; </a></button>
         </div>
         <div class="header">
-            <i class=" fa fa-user-circle"></i>
-            <span class='user2'>User2</span>
+            <i class=" fa fa-user-circle fa-2x"></i>
+            <span class="user2">User2</span>
             <button id="otherChats" class="options"> Other Chats</button>
 
 
@@ -347,36 +344,6 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
     <button id="add">Class</button>
     <script>
         var modal = document.getElementById('otherChats_div');
-        Array.from(document.getElementsByClassName('listOptions')).forEach(function(element) {
-            element.addEventListener('click', function(e) {
-                var user2 = element.lastElementChild.innerText;
-
-                Array.from(document.getElementById('list').children).forEach(function(el) {
-                    if (el.lastElementChild.innerText == localStorage.getItem('user2')) {
-                        el.className = "listOptions";
-                    }
-                })
-                element.classList.add('selected');
-                localStorage.setItem('user2', user2);
-                modal.style.display = "none";
-                Array.from(document.getElementsByClassName('user2')).forEach(function(element) {
-                    element.innerHTML = localStorage.getItem('user2');
-                })
-                
-                table_name().then(function(x){
-                    var json=JSON.parse(x.responseText);
-                    console.log(json['table_name']);
-                    load_msgs(json['table_name']).then(function(xhr){
-                        var json_msgs=JSON.parse(xhr.responseText);
-                        
-                        for(var i=0;i<json_msgs.length;i++){
-                            console.log(json_msgs[i]);
-                            
-                        }
-                    })
-                });
-            })
-        })
 
         window.addEventListener('click', function(e) {
             if (e.target == modal)
@@ -398,13 +365,18 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
 
         })
         window.onload = function() {
+            sessionStorage.removeItem('user2');
+            sessionStorage.removeItem('tn');
+            localStorage.removeItem('user2');
+            localStorage.removeItem('tn');
+            chatPanel.innerHTML = "";
 
             window.addEventListener('keydown', function(e) {
                 if (e.which == 17 || e.key == '17') {
-                    localStorage.setItem('secret', 1);
+                    sessionStorage.setItem('secret', 1);
                     document.getElementById('secret').style.display = 'block';
                 } else if (e.which == 16) {
-                    localStorage.setItem('secret', 0);
+                    sessionStorage.setItem('secret', 0);
                     document.getElementById('secret').style.display = 'none';
                 } else if (e.which == 13 && e.shiftKey == false) {
                     var ta = document.getElementById('msg');
@@ -413,11 +385,83 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
                     }
                 }
             });
-            /* if(localStorage.getItem('secret')==1){ 
+            /* if(sessionStorage.getItem('secret')==1){ 
                 var evt=new KeyboardEvent('keydown',{ 'key': 17, 'which': 17 });
                 document.dispatchEvent(evt);
                 console.log(evt);
                 } */
+
+
+
+
+            function retrieve_list() {
+                var xhr = new XMLHttpRequest();
+                return new Promise(function(resolve) {
+                    xhr.onreadystatechange = function() {
+                        if (xhr.status >= 200 & xhr.status < 300 & xhr.readyState == 4) {
+                            resolve(xhr);
+                            console.log(xhr.responseText);
+                        }
+                    }
+                    xhr.open('post', './load_list.php');
+                    var formdata = new FormData();
+                    formdata.append('username', localStorage.getItem('username'));
+                    xhr.send(formdata);
+                })
+            }
+
+            function make_list(list_array) {
+                var l = document.getElementById('list');
+                var json = JSON.parse(list_array);
+                for (var i = 0; i < json.length; i++) {
+                    var new_listOption = document.createElement('div');
+                    new_listOption.className = "listOptions";
+                    var new_i = document.createElement('i');
+                    new_i.className = "fa fa-user-circle fa-2x";
+                    var new_span = document.createElement('span');
+                    new_span.className = "user2";
+                    new_span.innerText = json[i];
+                    new_listOption.append(new_i);
+                    new_listOption.append(new_span);
+                    l.append(new_listOption);
+                }
+            }
+            retrieve_list().then(function(x) {
+                make_list(x.responseText)
+            }).then(function() {
+                Array.from(document.getElementsByClassName('listOptions')).forEach(function(element) {
+                    element.addEventListener('click', function(e) {
+                        var user2 = element.lastElementChild.innerText;
+
+                        Array.from(document.getElementById('list').children).forEach(function(el) {
+                            if (el.lastElementChild.innerText == sessionStorage.getItem('user2')) {
+                                el.className = "listOptions";
+                            }
+                        })
+                        element.classList.add('selected');
+                        sessionStorage.setItem('user2', user2);
+                        modal.style.display = "none";
+                        Array.from(document.getElementsByClassName('user2')).forEach(function(element) {
+                            element.innerHTML = sessionStorage.getItem('user2');
+                        })
+
+                        table_name().then(function(x) {
+                            var json = JSON.parse(x.responseText);
+                            console.log(json['table_name']);
+                            sessionStorage.setItem('tn', json['table_name']);
+                            load_msgs(json['table_name']).then(function(xhr) {
+                                var json_msgs = JSON.parse(xhr.responseText);
+                                chatPanel.innerHTML = "";
+                                for (var i = 0; i < json_msgs.length; i++) {
+                                    chatPanel.append(make_msg(json_msgs[i].from_user, json_msgs[i].to_user, json_msgs[i].msg, json_msgs[i].year, json_msgs[i].month, json_msgs[i].day, json_msgs[i].hour, json_msgs[i].min, json_msgs[i].sec));
+                                    chatPanel.scrollTop = chatPanel.scrollHeight;
+
+                                }
+                            })
+                        });
+                    })
+                })
+            });
         }
 
         Array.from(document.getElementsByClassName('name')).forEach(function(element) {
@@ -443,9 +487,13 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
         function send_msg(msg, d) {
             var xhr = new XMLHttpRequest();
             var formdata = new FormData();
+            formdata.append('table_name', sessionStorage.getItem('tn'));
+            formdata.append('from_user', localStorage.getItem('username'));
+            formdata.append('to_user', sessionStorage.getItem('user2'));
+            formdata.append('msg', msg);
             formdata.append('msg', msg);
             formdata.append('day', d.getDate());
-            formdata.append('month', d.getMonth());
+            formdata.append('month', eval(d.getMonth() + 1));
             formdata.append('year', d.getFullYear());
             formdata.append('h', d.getHours());
             formdata.append('m', d.getMinutes());
@@ -462,28 +510,29 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
                 xhr.send(formdata);
             })
         }
-        
-        function table_name(){
-            var xhr= new XMLHttpRequest();
-            return new Promise(function(resolve){
-                var formdata=new FormData();
-                formdata.append('user1',localStorage.getItem('username'));
-                formdata.append('user2',localStorage.getItem('user2'));
-                xhr.onreadystatechange=function(){
+
+        function table_name() {
+            var xhr = new XMLHttpRequest();
+            return new Promise(function(resolve) {
+                var formdata = new FormData();
+                formdata.append('user1', localStorage.getItem('username'));
+                formdata.append('user2', sessionStorage.getItem('user2'));
+                xhr.onreadystatechange = function() {
                     if (xhr.status >= 200 & xhr.status < 300 & xhr.readyState == 4) {
                         resolve(xhr);
                         console.log(xhr.responseText);
                     }
                 }
-                xhr.open('post','./table_name.php');
+                xhr.open('post', './table_name.php');
                 xhr.send(formdata);
             })
         }
+
         function load_msgs(tn) {
             var xhr = new XMLHttpRequest();
             return new Promise(function(resolve) {
-                var formdata=new FormData();
-                formdata.append('table_name',tn);
+                var formdata = new FormData();
+                formdata.append('table_name', tn);
                 xhr.onreadystatechange = function() {
                     if (xhr.status >= 200 & xhr.status < 300 & xhr.readyState == 4) {
                         resolve(xhr);
@@ -495,23 +544,29 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
             })
         }
 
-        document.getElementById('send').addEventListener('click', function() {
-            var msg = document.getElementById('msg').value;
+
+
+        function make_msg(from_user, to_user, msg, year, month, day, h, m, s) {
             var new_msg = document.createElement('div');
             new_msg.className = "msg";
             var new_mymsg = document.createElement('div');
-            new_mymsg.className = "mymsg";
+            if (from_user == localStorage.getItem('username')) new_mymsg.className = "mymsg";
+            else new_mymsg.className = "yourmsg";
             new_mymsg.innerText = msg;
             var new_time = document.createElement('div');
             new_time.className = "time";
-            var d = new Date();
-            var date = d.getDate() + "/" + eval(d.getMonth() + 1) + "/" + d.getFullYear() + "   " + d.getHours() + ":" + d.getMinutes();
+            var date = day + "/" + month + "/" + year + "   " + h + ":" + m;
             new_time.innerText = date;
             new_mymsg.append(new_time);
             new_msg.append(new_mymsg);
-            chatPanel.append(new_msg);
+            return new_msg;
+        }
+
+        document.getElementById('send').addEventListener('click', function() {
+            var msg = document.getElementById('msg').value;
+            var d = new Date();
+            chatPanel.append(make_msg(localStorage.getItem('username'), sessionStorage.getItem('user2'), msg, d.getFullYear(), eval(d.getMonth() + 1), d.getDate(), d.getHours(), d.getMinutes(), d.getSeconds()));
             chatPanel.scrollTop = chatPanel.scrollHeight;
-            console.log(new_msg);
             send_msg(msg, d).then(function() {
                 document.getElementById('msg').value = '';
                 document.getElementById('msg').setAttribute('placeholder', 'Type your msg');

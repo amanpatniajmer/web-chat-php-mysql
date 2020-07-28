@@ -2,8 +2,22 @@
 include 'db.php';
 switch ($_POST['submit']) {
     case 'Send':
-        $msg= $_POST['msg'];
-        echo $msg;
+$query="INSERT INTO ".$_POST['table_name']." (from_user, to_user, msg, year,
+ month, day, hour, min, sec) VALUES('".$_POST['from_user']."', '".$_POST['to_user'].
+ "', '".$_POST['msg']."', ".$_POST['year'].", ".$_POST['month'].", ".$_POST['day'].", "
+ .$_POST['h'].", ".$_POST['m'].", ".$_POST['s'].")";
+ if ($result = mysqli_query($db, $query)) {
+
+    /* fetch associative array */
+    echo "Success";
+
+    /* free result set */
+
+} else {
+    $json=['name'=>'','message'=>'Invalid User'];
+        echo json_encode($json);
+    
+}
         break;
     
     default:
