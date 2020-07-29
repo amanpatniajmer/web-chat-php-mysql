@@ -1,39 +1,64 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-<script>
-    var ws= new WebSocket('ws://localhost:8181');
-    ws.onopen=function(){console.log("Success"+ws)};
+<?php
+include 'db.php';
 
-    /* function doHandshake($received_header,$client_socket_resource, $host_name, $port) {
-		$headers = array();
-		$lines = preg_split("/\r\n/", $received_header);
-		foreach($lines as $line)
-		{
-			$line = chop($line);
-			if(preg_match('/\A(\S+): (.*)\z/', $line, $matches))
-			{
-				$headers[$matches[1]] = $matches[2];
-			}
-		}
+    $socket=socket_create(AF_INET,SOCK_STREAM,0);
+if(!$socket) die("Creation Failed");
+echo "Socket created\n";
+$bind=socket_bind($socket,"127.0.0.1",20204);
+if(!$bind) die("Binding Failed");
+echo "Socket binded\n";
 
-		$secKey = $headers['Sec-WebSocket-Key'];
-		$secAccept = base64_encode(pack('H*', sha1($secKey . '258EAFA5-E914-47DA-95CA-C5AB0DC85B11')));
-		$buffer  = "HTTP/1.1 101 Web Socket Protocol Handshake\r\n" .
-		"Upgrade: websocket\r\n" .
-		"Connection: Upgrade\r\n" .
-		"WebSocket-Origin: $host_name\r\n" .
-		"WebSocket-Location: ws://$host_name:$port/demo/shout.php\r\n".
-		"Sec-WebSocket-Accept:$secAccept\r\n\r\n";
-		socket_write($client_socket_resource,$buffer,strlen($buffer));
+
+class Chat{
+	function readline() {
+		return rtrim(fgets(STDIN));
 	}
-	 */
-</script>    
-</body>
+}
 
-</html>
+$bind=socket_listen($socket,10) or die ("Listening Failed");
+echo "Listening for connections....";
+while(true){
+	$accept=socket_accept($socket) or die("Accepting Failed");
+	echo "Socket accepted\n";
+	echo "Socket reading\n";
+	
+	$msg=socket_read($accept,1000) or die("Reading Failed");
+	$query="SELECT * FROM ".$msg." ORDER BY year ASC, month ASC, day ASC, hour ASC, min ASC, sec ASC";
+    if ($result = mysqli_query($db, $query)) {
+
+        /* fetch associative array */
+            $json=array();
+        while ($row = mysqli_fetch_assoc($result)) {
+            array_push($json,$row);
+        }
+        echo json_encode($json);
+        
+     /* }
+        else{
+            $json=['table_name'=>'','message'=>'Invalid Users'];
+            echo json_encode($json);
+        } */
+
+        /* free result set */
+        mysqli_free_result($result);
+    } else {
+        $json=['name'=>'','message'=>'Invalid User'];
+            echo json_encode($json);
+        
+	}
+	
+
+	echo $msg;
+	$msg=trim($msg);
+	//echo "Msg=".$msg;
+	$line=new Chat();
+	echo "Enter reply";
+	$reply="Hi from AJ WebSocket";
+	echo "Socket replying\n";
+	//$reply=$line->readline();
+
+	socket_write($accept,json_encode($json),strlen(json_encode($json))) or die("Writing Failed");
+}
+socket_close($accept,$socket);
+echo "Socket Closed";
+?>

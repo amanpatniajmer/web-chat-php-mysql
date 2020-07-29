@@ -1,11 +1,11 @@
 <?php
     include 'db.php';
-    $query="SELECT table_name FROM master WHERE (user1='".$_POST['user1']."' AND user2='".$_POST['user2']."') OR (user2='".$_POST['user1']."' AND user1='".$_POST['user2']."')";
+    $query="SELECT id FROM master WHERE (user1='".$_POST['user1']."' AND user2='".$_POST['user2']."') OR (user2='".$_POST['user1']."' AND user1='".$_POST['user2']."')";
     if ($result = mysqli_query($db, $query)) {
 
         /* fetch associative array */
         if ($row = mysqli_fetch_assoc($result)) {
-            $json=['table_name'=>$row['table_name']];
+            $json=['table_name'=>"chat".$row['id']];
             echo json_encode($json);
             exit();
         } else {

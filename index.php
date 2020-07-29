@@ -20,6 +20,11 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
         word-break: break-all;
     }
 
+    h1,
+    .name {
+        font-family: cursive;
+    }
+
     .center {
         margin: auto;
         text-align: center;
@@ -43,9 +48,10 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
     }
 
     #chatPanel {
+        box-shadow: 2px 10px 21px 0px rgba(0, 0, 0, 0.33);
         width: inherit;
         background-color: rgba(0, 0, 0, 0.61);
-        height: calc(100vh - 200px);
+        height: calc(100vh - 250px);
         display: flex;
         align-items: flex-end;
         flex-flow: column;
@@ -157,6 +163,8 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
     }
 
     .options {
+        background-color: #fb3b98;
+        color: white;
         align-self: flex-end;
         float: right;
         border: none;
@@ -190,6 +198,7 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
     }
 
     .modal-content {
+        font-size: 18px;
         max-width: 100vw;
         margin: auto;
         width: 350px;
@@ -197,6 +206,7 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
         overflow: auto;
         background-color: white;
         border-radius: 0px 0px 15px 15px;
+        position: relative;
     }
 
     .close {
@@ -212,6 +222,7 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
 
     .list {
         border: #ececec solid 1px;
+        position: relative;
     }
 
     .listOptions {
@@ -250,19 +261,86 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
             height: 0px;
         }
     }
+
+    @keyframes left {
+        from {
+            width: 0px;
+        }
+
+        to {
+            width: 300px;
+        }
+    }
+
+    @keyframes right {
+        from {
+            width: 300px;
+        }
+
+        to {
+            width: 0px;
+        }
+    }
+
+    #add_user {
+        margin: 5px;
+        color: white;
+        padding: 10px;
+        background-color: rgba(119, 64, 207, 1.0);
+        border-radius: 100%;
+        cursor: pointer;
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+    }
+
+    .user2 {
+        padding: 8px;
+    }
+
+    #new_user {
+        width: 300px;
+        display: none;
+        border-radius: 10px 10px 10px 10px;
+        border: black solid 1px;
+        position: absolute;
+        bottom: 9px;
+        right: 10px;
+        padding-top: 0px;
+        padding-bottom: 0px;
+    }
+
+    #info_add_user {
+        display: none;
+    }
+
+    .error-msg {
+        color: #D8000C;
+        background-color: #FFBABA;
+    }
+
+    .success-msg {
+        color: #270;
+        background-color: #DFF2BF;
+    }
 </style>
 
 <body>
     <div class="modal" id="otherChats_div">
         <div class="modal-content" id="otherChats-content">
+            <br />
             Other Chats
+            <br /><br />
             <div class="list" id="list">
-                <div class="listOptions">
-                    <i class=" fa fa-user-circle fa-2x"></i>
-                    <span class="user2">Usernames</span>
-                </div>
+
+
             </div>
-            <br /><br /><br /><br /><br /><br /><br />
+            <input type="text" name="new_user" id="new_user" placeholder="Enter Username to add friend" />
+            <i class="fa fa-user-plus" id="add_user" onclick="toggle_add()"></i>
+            <div id="info_add_user" class="">
+                <i class=""></i>
+                Info
+            </div>
         </div>
         <div class="close" id="close"><i style="color:white; font-size: 25px;" class="fa fa-chevron-up"></i></div>
     </div>
@@ -285,49 +363,11 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
         <div id="chatPanel">
             <br /><br /><br /><br />
             <div class="msg">
-                <div class="mymsg">
-                    AJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJ
-                </div>
-            </div>
-            <div class="msg">
                 <div class="yourmsg">
-                    AANC
-                </div>
-            </div>
-            <div class="msg">
-                <div class="mymsg">
-                    AJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJAJ
+                    Select friend from OtherChats Option.
                     <div class="time">
                         10:30
                     </div>
-                </div>
-            </div>
-            <div class="msg">
-                <div class="yourmsg">
-                    AANC
-                    <div class="time">
-                        10:30
-                    </div>
-                </div>
-            </div>
-            <div class="msg">
-                <div class="yourmsg">
-                    AANC
-                </div>
-            </div>
-            <div class="msg">
-                <div class="yourmsg">
-                    AANC
-                </div>
-            </div>
-            <div class="msg">
-                <div class="yourmsg">
-                    AANC
-                </div>
-            </div>
-            <div class="msg">
-                <div class="yourmsg">
-                    AANC
                 </div>
             </div>
         </div>
@@ -341,174 +381,39 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
         </div>
 
     </div>
-    <button id="add">Class</button>
     <script>
-        var modal = document.getElementById('otherChats_div');
-
-        window.addEventListener('click', function(e) {
-            if (e.target == modal)
-                modal.style.display = "none";
-        })
-        document.getElementById('close').addEventListener('click', function() {
-
-            document.getElementById('list').style.animation = "up 300ms ease"
-            document.getElementById('list').style.height = "0px";
-            setTimeout(function() {
-                document.getElementById('otherChats_div').style.display = 'none';
-            }, 300);
-        })
-        document.getElementById('otherChats').addEventListener('click', function() {
-            var od = document.getElementById('otherChats_div');
-            od.style.display = 'block';
-            document.getElementById('list').style.animation = "down 500ms ease";
-            document.getElementById('list').style.height = "300px";
-
-        })
-        window.onload = function() {
-            sessionStorage.removeItem('user2');
-            sessionStorage.removeItem('tn');
-            localStorage.removeItem('user2');
-            localStorage.removeItem('tn');
-            chatPanel.innerHTML = "";
-
-            window.addEventListener('keydown', function(e) {
-                if (e.which == 17 || e.key == '17') {
-                    sessionStorage.setItem('secret', 1);
-                    document.getElementById('secret').style.display = 'block';
-                } else if (e.which == 16) {
-                    sessionStorage.setItem('secret', 0);
-                    document.getElementById('secret').style.display = 'none';
-                } else if (e.which == 13 && e.shiftKey == false) {
-                    var ta = document.getElementById('msg');
-                    if (e.target == ta) {
-                        document.getElementById('send').click();
-                    }
-                }
-            });
-            /* if(sessionStorage.getItem('secret')==1){ 
-                var evt=new KeyboardEvent('keydown',{ 'key': 17, 'which': 17 });
-                document.dispatchEvent(evt);
-                console.log(evt);
-                } */
-
-
-
-
-            function retrieve_list() {
-                var xhr = new XMLHttpRequest();
-                return new Promise(function(resolve) {
-                    xhr.onreadystatechange = function() {
-                        if (xhr.status >= 200 & xhr.status < 300 & xhr.readyState == 4) {
-                            resolve(xhr);
-                            console.log(xhr.responseText);
-                        }
-                    }
-                    xhr.open('post', './load_list.php');
-                    var formdata = new FormData();
-                    formdata.append('username', localStorage.getItem('username'));
-                    xhr.send(formdata);
-                })
-            }
-
-            function make_list(list_array) {
-                var l = document.getElementById('list');
-                var json = JSON.parse(list_array);
-                for (var i = 0; i < json.length; i++) {
-                    var new_listOption = document.createElement('div');
-                    new_listOption.className = "listOptions";
-                    var new_i = document.createElement('i');
-                    new_i.className = "fa fa-user-circle fa-2x";
-                    var new_span = document.createElement('span');
-                    new_span.className = "user2";
-                    new_span.innerText = json[i];
-                    new_listOption.append(new_i);
-                    new_listOption.append(new_span);
-                    l.append(new_listOption);
-                }
-            }
-            retrieve_list().then(function(x) {
-                make_list(x.responseText)
-            }).then(function() {
-                Array.from(document.getElementsByClassName('listOptions')).forEach(function(element) {
-                    element.addEventListener('click', function(e) {
-                        var user2 = element.lastElementChild.innerText;
-
-                        Array.from(document.getElementById('list').children).forEach(function(el) {
-                            if (el.lastElementChild.innerText == sessionStorage.getItem('user2')) {
-                                el.className = "listOptions";
-                            }
-                        })
-                        element.classList.add('selected');
-                        sessionStorage.setItem('user2', user2);
-                        modal.style.display = "none";
-                        Array.from(document.getElementsByClassName('user2')).forEach(function(element) {
-                            element.innerHTML = sessionStorage.getItem('user2');
-                        })
-
-                        table_name().then(function(x) {
-                            var json = JSON.parse(x.responseText);
-                            console.log(json['table_name']);
-                            sessionStorage.setItem('tn', json['table_name']);
-                            load_msgs(json['table_name']).then(function(xhr) {
-                                var json_msgs = JSON.parse(xhr.responseText);
-                                chatPanel.innerHTML = "";
-                                for (var i = 0; i < json_msgs.length; i++) {
-                                    chatPanel.append(make_msg(json_msgs[i].from_user, json_msgs[i].to_user, json_msgs[i].msg, json_msgs[i].year, json_msgs[i].month, json_msgs[i].day, json_msgs[i].hour, json_msgs[i].min, json_msgs[i].sec));
-                                    chatPanel.scrollTop = chatPanel.scrollHeight;
-
-                                }
-                            })
-                        });
-                    })
-                })
-            });
-        }
-
-        Array.from(document.getElementsByClassName('name')).forEach(function(element) {
-            element.innerHTML = localStorage.getItem('name');
-        })
-        document.getElementById('msg').onchange = function() {
-            document.getElementById('msg').setAttribute('placeholder', '');
-        }
-        var chatPanel = document.getElementById('chatPanel');
-        chatPanel.scrollTop = chatPanel.scrollHeight;
-        document.getElementById('add').addEventListener('click', function() {
-            Array.from(document.getElementsByClassName('yourmsg')).forEach(function(element) {
-                element.className = "mymsg";
-            })
-        })
-
-        /* 
-                var ws=new WebSocket('ws://localhost/chat/send.php')
-                console.log(ws);
-                ws.onopen=function(){console.log('Connection Established')}; */
-
-
-        function send_msg(msg, d) {
+        function retrieve_list() {
             var xhr = new XMLHttpRequest();
-            var formdata = new FormData();
-            formdata.append('table_name', sessionStorage.getItem('tn'));
-            formdata.append('from_user', localStorage.getItem('username'));
-            formdata.append('to_user', sessionStorage.getItem('user2'));
-            formdata.append('msg', msg);
-            formdata.append('msg', msg);
-            formdata.append('day', d.getDate());
-            formdata.append('month', eval(d.getMonth() + 1));
-            formdata.append('year', d.getFullYear());
-            formdata.append('h', d.getHours());
-            formdata.append('m', d.getMinutes());
-            formdata.append('s', d.getSeconds());
-            formdata.append('submit', 'Send');
-            return new Promise(function(resolve, reject) {
+            return new Promise(function(resolve) {
                 xhr.onreadystatechange = function() {
-                    if (xhr.status >= 200 & xhr.status < 300) {
+                    if (xhr.status >= 200 & xhr.status < 300 & xhr.readyState == 4) {
                         resolve(xhr);
                         console.log(xhr.responseText);
                     }
                 }
-                xhr.open('post', './send.php');
+                xhr.open('post', './load_list.php');
+                var formdata = new FormData();
+                formdata.append('username', localStorage.getItem('username'));
                 xhr.send(formdata);
             })
+        }
+
+        function make_list(list_array) {
+            var l = document.getElementById('list');
+            l.innerHTML = "";
+            var json = JSON.parse(list_array);
+            for (var i = 0; i < json.length; i++) {
+                var new_listOption = document.createElement('div');
+                new_listOption.className = "listOptions";
+                var new_i = document.createElement('i');
+                new_i.className = "fa fa-user-circle fa-2x";
+                var new_span = document.createElement('span');
+                new_span.className = "friends";
+                new_span.innerText = json[i];
+                new_listOption.append(new_i);
+                new_listOption.append(new_span);
+                l.append(new_listOption);
+            }
         }
 
         function table_name() {
@@ -544,8 +449,6 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
             })
         }
 
-
-
         function make_msg(from_user, to_user, msg, year, month, day, h, m, s) {
             var new_msg = document.createElement('div');
             new_msg.className = "msg";
@@ -562,46 +465,262 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
             return new_msg;
         }
 
-        document.getElementById('send').addEventListener('click', function() {
-            var msg = document.getElementById('msg').value;
-            var d = new Date();
-            chatPanel.append(make_msg(localStorage.getItem('username'), sessionStorage.getItem('user2'), msg, d.getFullYear(), eval(d.getMonth() + 1), d.getDate(), d.getHours(), d.getMinutes(), d.getSeconds()));
-            chatPanel.scrollTop = chatPanel.scrollHeight;
-            send_msg(msg, d).then(function() {
-                document.getElementById('msg').value = '';
-                document.getElementById('msg').setAttribute('placeholder', 'Type your msg');
-                //load_msgs();
-            })
+        function load() {
+            table_name().then(function(x) {
+                var json = JSON.parse(x.responseText);
+                //console.log(json['table_name']);
+                sessionStorage.setItem('tn', json['table_name']);
+                load_msgs(json['table_name']).then(function(xhr) {
+                    var json_msgs = JSON.parse(xhr.responseText);
+                    chatPanel.innerHTML = "";
+                    for (var i = 0; i < json_msgs.length; i++) {
+                        chatPanel.append(make_msg(json_msgs[i].from_user, json_msgs[i].to_user, json_msgs[i].msg, json_msgs[i].year, json_msgs[i].month, json_msgs[i].day, json_msgs[i].hour, json_msgs[i].min, json_msgs[i].sec));
+                        chatPanel.scrollTop = chatPanel.scrollHeight;
 
-        })
-        var form = document.getElementById('msg_form');
-        form.onsubmit = function() {
-            return false;
+                    }
+                })
+            });
+
         }
-        setInterval(function() {
-            authenticate().then(function(xhr) {
-                if (xhr.responseText == "Invalid User") {
-                    window.location.href = "login.php";
-                }
-            })
-        }, 5000);
 
-        function authenticate() {
+        function load_list() {
+            document.getElementById('list').innerHTML = "";
+            document.getElementById('list').innerText = "";
+            retrieve_list().then(function(x) {
+                make_list(x.responseText)
+            }).then(function() {
+                Array.from(document.getElementsByClassName('listOptions')).forEach(function(element) {
+                    element.addEventListener('click', function(e) {
+                        var user2 = element.lastElementChild.innerText;
+                        sessionStorage.setItem('user2', user2);
+                        Array.from(document.getElementById('list').children).forEach(function(el) {
+                            if (el.lastElementChild.innerText != sessionStorage.getItem('user2')) {
+                                el.className = "listOptions";
+                            } else {
+                                element.classList.add('selected');
+                            }
+                        })
+                        load();
+                        modal.style.display = "none";
+                        Array.from(document.getElementsByClassName('user2')).forEach(function(element) {
+                            element.innerHTML = sessionStorage.getItem('user2');
+                        })
+                    })
+                })
+            });
+        }
+
+        function toggle_add() {
+            var x = document.getElementById('add_user');
+            x.classList.toggle('fa-chevron-circle-right');
+            x.classList.toggle('fa-user-plus');
+            if (x.classList == "fa fa-user-plus") {
+                document.getElementById('new_user').style.animation = "right 800ms ease";
+                setTimeout(function() {
+                    document.getElementById('new_user').style.display = "none";
+                }, 500);
+                if (!(document.getElementById('new_user').value.trim() == "")) {
+                    check_friend(document.getElementById('new_user').value);
+                }
+            } else {
+                document.getElementById('new_user').style.animation = "left 800ms ease";
+                document.getElementById('new_user').style.display = "block";
+                document.getElementById('new_user').focus();
+            }
+        }
+
+        function check_friend(new_friend) {
             var xhr = new XMLHttpRequest();
+            var formdata = new FormData();
+            formdata.append('new_friend', new_friend);
+            formdata.append('username', localStorage.getItem('username'));
             return new Promise(function(resolve) {
-                var formdata = new FormData();
-                formdata.append('submit', 'check');
-                console.log(formdata);
                 xhr.onreadystatechange = function() {
                     if (xhr.status >= 200 & xhr.status < 300 & xhr.readyState == 4) {
                         resolve(xhr);
+                        var a = document.getElementById('info_add_user');
+                        a.style.display = "block";
                         console.log(xhr.responseText);
-
+                        if (xhr.responseText == "success") {
+                            a.className = "success-msg";
+                            a.childNodes[2].nodeValue="Successfully added friend.";
+                            a.childNodes[1].className = "fa fa-check";
+                            load_list();
+                        } else {
+                            a.className = "error-msg";
+                            a.childNodes[1].className = "fa fa-times-circle";
+                            a.childNodes[2].nodeValue=xhr.responseText;
+                        }
+                        setTimeout(function() {
+                            a.style.display = "none";
+                        }, 5000);
                     }
                 }
-                xhr.open('post', './validate_login.php');
+                xhr.open('post', './check_friend.php');
                 xhr.send(formdata);
             })
+        }
+
+
+        var modal = document.getElementById('otherChats_div');
+        window.addEventListener('click', function(e) {
+            if (e.target == modal)
+                modal.style.display = "none";
+        })
+        document.getElementById('close').addEventListener('click', function() {
+
+            document.getElementById('list').style.animation = "up 300ms ease"
+            document.getElementById('list').style.height = "0px";
+            setTimeout(function() {
+                document.getElementById('otherChats_div').style.display = 'none';
+            }, 300);
+        })
+        document.getElementById('otherChats').addEventListener('click', function() {
+            var od = document.getElementById('otherChats_div');
+            od.style.display = 'block';
+            document.getElementById('list').style.animation = "down 500ms ease";
+            document.getElementById('list').style.height = "300px";
+
+        })
+        window.onload = function() {
+            var chatPanel = document.getElementById('chatPanel');
+            sessionStorage.removeItem('user2');
+            sessionStorage.removeItem('tn');
+            localStorage.removeItem('user2');
+            localStorage.removeItem('tn');
+            //chatPanel.innerHTML = "";
+
+
+
+
+            window.addEventListener('keydown', function(e) {
+                if (e.which == "17" || e.key == "17") {
+                    sessionStorage.setItem('secret', 1);
+                    document.getElementById('secret').style.display = 'block';
+                } else if (e.which == 16) {
+                    sessionStorage.setItem('secret', 0);
+                    document.getElementById('secret').style.display = 'none';
+                } else if (e.which == 13 && e.shiftKey == false) {
+                    var ta = document.getElementById('msg');
+                    if (e.target == ta) {
+                        document.getElementById('send').click();
+                    }
+                }
+            });
+            if (sessionStorage.getItem('secret') == 1) {
+                var evt = new KeyboardEvent('keydown', {
+                    'key': 17,
+                    'which': 17
+                });
+                window.dispatchEvent(evt);
+            }
+
+
+
+
+            load_list();
+
+
+
+
+
+            Array.from(document.getElementsByClassName('name')).forEach(function(element) {
+                element.innerHTML = localStorage.getItem('name');
+            })
+            document.getElementById('msg').onchange = function() {
+                if (document.getElementById('msg').value.trim() == '') {
+                    document.getElementById('msg').setAttribute('placeholder', '');
+                } else {
+                    document.getElementById('msg').setAttribute('placeholder', 'Type your msg');
+                }
+            }
+            chatPanel.scrollTop = chatPanel.scrollHeight;
+
+            /* 
+                    var ws=new WebSocket('ws://localhost/chat/send.php')
+                    console.log(ws);
+                    ws.onopen=function(){console.log('Connection Established')}; */
+
+
+            function send_msg(msg, d) {
+                var xhr = new XMLHttpRequest();
+                var formdata = new FormData();
+                formdata.append('table_name', sessionStorage.getItem('tn'));
+                formdata.append('from_user', localStorage.getItem('username'));
+                formdata.append('to_user', sessionStorage.getItem('user2'));
+                formdata.append('msg', msg);
+                formdata.append('msg', msg);
+                formdata.append('day', d.getDate());
+                formdata.append('month', eval(d.getMonth() + 1));
+                formdata.append('year', d.getFullYear());
+                formdata.append('h', d.getHours());
+                formdata.append('m', d.getMinutes());
+                formdata.append('s', d.getSeconds());
+                formdata.append('submit', 'Send');
+                return new Promise(function(resolve, reject) {
+                    xhr.onreadystatechange = function() {
+                        if (xhr.status >= 200 & xhr.status < 300) {
+                            resolve(xhr);
+                            //console.log(xhr.responseText);
+                        }
+                    }
+                    xhr.open('post', './send.php');
+                    xhr.send(formdata);
+                })
+            }
+
+
+
+
+
+
+            document.getElementById('send').addEventListener('click', function() {
+                var msg = document.getElementById('msg').value;
+                if (msg.trim() == '') {
+                    alert('Please enter text.');
+                } else if (!sessionStorage.getItem('user2')) {
+                    alert('Please select a friend to chat from Other Chats');
+                } else {
+                    var d = new Date();
+                    chatPanel.append(make_msg(localStorage.getItem('username'), sessionStorage.getItem('user2'), msg, d.getFullYear(), eval(d.getMonth() + 1), d.getDate(), d.getHours(), d.getMinutes(), d.getSeconds()));
+                    chatPanel.scrollTop = chatPanel.scrollHeight;
+                    send_msg(msg, d).then(function() {
+                        document.getElementById('msg').value = '';
+                        document.getElementById('msg').setAttribute('placeholder', 'Type your msg');
+                        //load_msgs();
+                    })
+                }
+            })
+            var form = document.getElementById('msg_form');
+            form.onsubmit = function() {
+                return false;
+            }
+            setInterval(function() {
+                authenticate().then(function(xhr) {
+                    if (xhr.responseText == "Invalid User") {
+                        window.location.href = "login.php";
+                    } else {
+                        if (sessionStorage.getItem('tn')) load();
+                    }
+                })
+
+            }, 5000);
+
+            function authenticate() {
+                var xhr = new XMLHttpRequest();
+                return new Promise(function(resolve) {
+                    var formdata = new FormData();
+                    formdata.append('submit', 'check');
+                    xhr.onreadystatechange = function() {
+                        if (xhr.status >= 200 & xhr.status < 300 & xhr.readyState == 4) {
+                            resolve(xhr);
+                            console.log(xhr.responseText);
+                        }
+                    }
+                    xhr.open('post', './validate_login.php');
+                    xhr.send(formdata);
+                })
+            }
         }
     </script>
 </body>

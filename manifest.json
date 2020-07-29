@@ -1,0 +1,19 @@
+{
+    "name":"Chat Web Application",
+    "short_name":"Chat",
+    "start_url":"./login.php",
+    "display":"standalone",
+    "background_color":"#fff",
+    "theme_color":"#f00",
+    "description":"Light weight Chat application with native app experience.",
+    "icons":[{
+        "src":"icon.png", "sizes":"512x512"
+    },
+    {
+
+    }],
+    "shortcuts":[{
+        "name":"Chat",
+        "url":"login.php"
+    }]
+}

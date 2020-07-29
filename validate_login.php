@@ -32,6 +32,14 @@ switch ($_POST['submit']) {
         }
         break;
     case 'SignUp':
+        if(strlen($_POST['name'])>75 or strlen($_POST['username'])>25 or strlen($_POST['password'])>25){
+            echo "Name should not be longer than 75 characters.\n Username and password should not be longer than 25 characters.\n";
+            exit();
+        }
+        if(trim($_POST['name'])=='' or trim($_POST['username'])=='' or trim($_POST['password'])==''){
+            echo "Fields cannot be empty";
+            exit();
+        }
         $query = "INSERT INTO users (name,username,pass) VALUES ('".$_POST['name']."','".$_POST['username']."','".$_POST['password']."')";
         $result=mysqli_query($db,$query);
         if($result){
