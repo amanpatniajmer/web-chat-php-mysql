@@ -58,7 +58,6 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
         flex-flow: column;
         padding: 5px;
         overflow: auto;
-
     }
 
     #input_div {
@@ -325,9 +324,23 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
         color: #270;
         background-color: #DFF2BF;
     }
+    #scroller{
+        display: block;
+        float: left;
+        bottom:0px;
+        color:green;
+        background-color: white;
+        padding: 8px;
+        margin-right: 5px;
+        align-self: flex-end;
+        margin-bottom: 5px !important;
+        border-radius: 100%;
+        box-shadow: -3px 3px 3px 1px rgba(0, 0, 0, 0.69);
+    }
 </style>
 
 <body>
+<div id="scroller_div"><i class="fa fa-hand-o-down fa-2x" id="scroller"></i></div>
     <div class="modal" id="otherChats_div">
         <div class="modal-content" id="otherChats-content">
             <br />
@@ -357,10 +370,6 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
             <i class=" fa fa-user-circle fa-2x" id="avatar"></i>
             <span class="user2">User2</span>
             <button id="otherChats" class="options"> Other Chats</button>
-
-
-
-
         </div>
         <div id="chatPanel">
             <br /><br /><br /><br />
@@ -370,11 +379,13 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
                 </div>
             </div>
         </div>
+        
         <div id="input_div">
             <form id="msg_form" method="POST" action="./send.php">
-                <!-- <input type="text" name="msg" id="msg" autofocus autocomplete="off" placeholder="Type your msg"> -->
+            <!-- <div>
+                <button name="link" id="link"><i class="fa fa-link"></i></button>
+            </div> -->
                 <textarea name="msg" id="msg" autofocus autocomplete="off" placeholder="Type your msg"></textarea>
-                <!--                 <input type="submit" name="submit" id="send" value="Send"> -->
                 <button type="submit" name="submit" id="send" value="Send"><i class="fa fa-paper-plane"></i></button>
             </form>
         </div>
@@ -437,6 +448,7 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
             return new Promise(function(resolve) {
                 var formdata = new FormData();
                 formdata.append('table_name', tn);
+                formdata.append('submit', 'initial');
                 xhr.onreadystatechange = function() {
                     if (xhr.status >= 200 & xhr.status < 300 & xhr.readyState == 4) {
                         resolve(xhr);
@@ -463,21 +475,57 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
             new_msg.append(new_mymsg);
             return new_msg;
         }
-
+        function partial_load(){
+                var xhr = new XMLHttpRequest();
+                var formdata = new FormData();
+                var d=new Date(sessionStorage.getItem('llt'));
+                formdata.append('table_name', sessionStorage.getItem('tn'));
+                formdata.append('from_user', localStorage.getItem('username'));
+                formdata.append('to_user', sessionStorage.getItem('user2'));
+                formdata.append('day', d.getDate());
+                formdata.append('month', eval(d.getMonth() + 1));
+                formdata.append('year', d.getFullYear());
+                formdata.append('h', d.getHours());
+                formdata.append('m', d.getMinutes());
+                formdata.append('s', d.getSeconds());
+                formdata.append('submit', 'partial');
+                return new Promise(function(resolve, reject) {
+                    xhr.onreadystatechange = function() {
+                        if (xhr.status >= 200 & xhr.status < 300) {
+                            resolve(xhr);
+                            console.log(xhr.responseText);
+                        }
+                    }
+                    xhr.open('post', './load_msgs.php');
+                    xhr.send(formdata);
+                })
+            }
         function load() {
             table_name().then(function(x) {
                 var json = JSON.parse(x.responseText);
-                //console.log(json['table_name']);
                 sessionStorage.setItem('tn', json['table_name']);
+                if(0 & sessionStorage.getItem('llt')){
+                    sessionStorage.setItem('llt',new Date());
+                    partial_load();
+                }
+                else{
                 load_msgs(json['table_name']).then(function(xhr) {
                     var json_msgs = JSON.parse(xhr.responseText);
+                
+                    if(chatPanel.scrollHeight- chatPanel.clientHeight - chatPanel.scrollTop<110)
+                    sessionStorage.setItem('load',1);
+                    //one message of 48.6 height
                     chatPanel.innerHTML = "";
+                    
                     for (var i = 0; i < json_msgs.length; i++) {
                         chatPanel.append(make_msg(json_msgs[i].from_user, json_msgs[i].to_user, json_msgs[i].msg, json_msgs[i].year, json_msgs[i].month, json_msgs[i].day, json_msgs[i].hour, json_msgs[i].min, json_msgs[i].sec));
-                        chatPanel.scrollTop = chatPanel.scrollHeight;
-
+                        if(sessionStorage.getItem('load')==1) {
+                            chatPanel.scrollTop = chatPanel.scrollHeight;
+                        }
                     }
+                    sessionStorage.removeItem('load');
                 })
+            }
             });
 
         }
@@ -583,8 +631,13 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
         })
         window.onload = function() {
             var chatPanel = document.getElementById('chatPanel');
+            document.getElementById('scroller_div').addEventListener('click',function(){
+                chatPanel.scrollTop=chatPanel.scrollHeight;
+                document.getElementById('scroller_div').style.display="none";
+            })
             sessionStorage.removeItem('user2');
             sessionStorage.removeItem('tn');
+            sessionStorage.setItem('load',1);
             //chatPanel.innerHTML = "";
 
             document.getElementById('avatar').addEventListener('click',function(){
@@ -597,9 +650,11 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
                 if (e.which == "17" || e.key == "17") {
                     sessionStorage.setItem('secret', 1);
                     document.getElementById('secret').style.display = 'block';
+                    document.getElementsByClassName('fa fa-paper-plane')[0].style.display="none";
                 } else if (e.which == 16) {
                     sessionStorage.setItem('secret', 0);
                     document.getElementById('secret').style.display = 'none';
+                    document.getElementsByClassName('fa fa-paper-plane')[0].style.display="block";
                 } else if (e.which == 13 && e.shiftKey == false) {
                     var ta = document.getElementById('msg');
                     if (e.target == ta) {
@@ -634,7 +689,6 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
                     document.getElementById('msg').setAttribute('placeholder', 'Type your msg');
                 }
             }
-            chatPanel.scrollTop = chatPanel.scrollHeight;
 
             /* 
                     var ws=new WebSocket('ws://localhost/chat/send.php')
@@ -700,11 +754,13 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
                     if (xhr.responseText == "Invalid User") {
                         window.location.href = "login.php";
                     } else {
-                        if (sessionStorage.getItem('tn')) load();
+                        if (sessionStorage.getItem('tn')) {
+                            load();
+                        }
                     }
                 })
 
-            }, 5000);
+            }, 3000);
 
             function authenticate() {
                 var xhr = new XMLHttpRequest();

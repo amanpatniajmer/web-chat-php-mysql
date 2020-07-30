@@ -2,6 +2,8 @@
 include 'db.php';
 switch ($_POST['submit']) {
     case 'login':
+        //FILTER_SANITIZE_EMAIL
+        //filter_var($a,fILTER)
         if(trim($_POST['username'])=='' or trim($_POST['password'])==''){
             $json=['name'=>'','message'=>'Fields cannot be empty'];
             echo json_encode($json);
