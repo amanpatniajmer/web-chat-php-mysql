@@ -33,7 +33,9 @@ else{
             border-radius: 5px;
             box-shadow: 2px 10px 21px 0px rgba(0, 0, 0, 0.33);
         }
-
+        a:visited{
+            color:blue;
+        }
         input {
             width: 100%;
             margin: 5px 0px;
@@ -41,7 +43,7 @@ else{
         }
 
         input[type=submit] {
-            background-color: royalblue;
+            background-color: rgba(119, 64, 207, 1.0);
             border: none;
             color: white;
             font-size: 16px;
@@ -81,11 +83,20 @@ else{
         <label>Password:
             <input id="password" type="password" name="password" required />
         </label>
+        <label>
+        <input type="checkbox" style="width:auto" onclick="togglePass()">
+        Show Password
+        </label>
         <span id="info" class=""><i class=""></i>Info</span>
         <input type="submit" name="submit" id="signup_btn" value="SignUp" />
         <span class="center"><a href="login.php">Already have an account? Login.</a></span>
     </form>
     <script>
+    function togglePass(){
+        var a=document.getElementById('password');
+        if(a.type=="password") a.type="text";
+        else a.type="password";
+    }
         var info = document.getElementById('info');
         document.getElementById('signup_form').onsubmit = function() {
             return false;
@@ -114,13 +125,13 @@ else{
                         if (xhr.responseText == "success") {
                             info.style.display = "block";
                             info.className = "success-msg";
-                            var t=document.createTextNode("Successfully created a new account. Please login by the following link.");
                             info.firstChild.className = "fa fa-check";
-                            info.append(t);
+                            info.childNodes[1].nodeValue="Successfully created a new account. Please login by the following link.";
                         } else {
                             info.style.display = "block";
                             info.className = "error-msg";
                             info.firstChild.className = "fa fa-times-circle";
+                            console.log(document.childNodes);
                             info.childNodes[1].nodeValue=xhr.responseText;
                         }
                         setTimeout(function() {

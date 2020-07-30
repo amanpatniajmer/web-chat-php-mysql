@@ -2,7 +2,22 @@
 include 'db.php';
 switch ($_POST['submit']) {
     case 'login':
-        $query = "SELECT name FROM users WHERE username='" . $_POST['username'] . "' AND pass='" . $_POST['password'] . "'";
+        if(trim($_POST['username'])=='' or trim($_POST['password'])==''){
+            $json=['name'=>'','message'=>'Fields cannot be empty'];
+            echo json_encode($json);
+            exit();
+        }
+        if(preg_match_all("/([\"'();])/",trim($_POST['username']))){
+            $json=['name'=>'','message'=>'Special characters are not allowed.'];
+            echo json_encode($json);
+            exit();
+        }
+        if(preg_match_all("/([\"'();])/",trim($_POST['password']))){
+            $json=['name'=>'','message'=>'Special characters are not allowed.'];
+            echo json_encode($json);
+            exit();
+        }
+        $query = "SELECT name FROM users WHERE username='" . $_POST['username'] . "' AND pass='" . htmlentities($_POST['password']) . "'";
         if ($result = mysqli_query($db, $query)) {
 
             /* fetch associative array */
@@ -32,6 +47,14 @@ switch ($_POST['submit']) {
         }
         break;
     case 'SignUp':
+        if(preg_match_all("/([\"'();])/",trim($_POST['username']))){
+            echo "Special characters are not allowed.";
+            exit();
+        }
+        if(preg_match_all("/([\"'();])/",trim($_POST['password']))){
+            echo "Special characters are not allowed.";
+            exit();
+        }
         if(strlen($_POST['name'])>75 or strlen($_POST['username'])>25 or strlen($_POST['password'])>25){
             echo "Name should not be longer than 75 characters.\n Username and password should not be longer than 25 characters.\n";
             exit();
@@ -40,7 +63,14 @@ switch ($_POST['submit']) {
             echo "Fields cannot be empty";
             exit();
         }
-        $query = "INSERT INTO users (name,username,pass) VALUES ('".$_POST['name']."','".$_POST['username']."','".$_POST['password']."')";
+        if(!preg_match_all('/^(([A-Za-z]+[\s]?)+)$/',trim($_POST['name']))){
+            echo "Name should only contains alphabets and maximum of one continous white space.";
+            exit();
+        }
+        if(!preg_match_all("/^([\S]+)$/",trim($_POST['username']))){
+            echo "No white spaces allowed in username";
+        }
+        $query = "INSERT INTO users (name,username,pass) VALUES ('".trim($_POST['name'])."','".trim($_POST['username'])."','".trim($_POST['password'])."')";
         $result=mysqli_query($db,$query);
         if($result){
             echo "success";

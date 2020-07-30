@@ -11,6 +11,7 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link rel="manifest" href="./manifest.json">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
 </head>
 <style>
@@ -51,7 +52,7 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
         box-shadow: 2px 10px 21px 0px rgba(0, 0, 0, 0.33);
         width: inherit;
         background-color: rgba(0, 0, 0, 0.61);
-        height: calc(100vh - 250px);
+        height: calc(100vh - 280px);
         display: flex;
         align-items: flex-end;
         flex-flow: column;
@@ -61,7 +62,6 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
     }
 
     #input_div {
-
         display: flex;
         flex-flow: column;
         width: 100%;
@@ -80,7 +80,7 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
     input[type=text],
     textarea,
     textarea:focus {
-        height: 50px;
+        height: 40px;
         resize: none;
         outline: none;
         border: none;
@@ -137,7 +137,7 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
     .time {
         align-self: flex-end;
         float: right;
-        color: grey;
+        color: hsl(0deg 0% 0% / 61%);
         font-size: 10px;
     }
 
@@ -147,11 +147,13 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
 
     button[type=submit] {
         font-size: 25px;
+        position: absolute;
         float: right;
         margin: 5px;
         border-radius: 100%;
         outline: none;
         border: none;
+        background-color: rgba(0,0,0,0);
     }
 
     #secret {
@@ -163,7 +165,7 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
     }
 
     .options {
-        background-color: #fb3b98;
+        background-color: rgb(80 47 152);
         color: white;
         align-self: flex-end;
         float: right;
@@ -172,7 +174,7 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
         border-radius: 15px 15px 15px 15px;
         font-size: 15px;
         cursor: pointer;
-        box-shadow: 2px 10px 21px 0px rgba(0, 0, 0, 0.33);
+        box-shadow: -2px 2px 1px 3px rgb(0 0 0 / 14%);
     }
 
     #pre-header {
@@ -352,7 +354,7 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
             <button id="logout" class="options"><a href="logout.php" style="color:white"> Logout &times; </a></button>
         </div>
         <div class="header">
-            <i class=" fa fa-user-circle fa-2x"></i>
+            <i class=" fa fa-user-circle fa-2x" id="avatar"></i>
             <span class="user2">User2</span>
             <button id="otherChats" class="options"> Other Chats</button>
 
@@ -365,9 +367,6 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
             <div class="msg">
                 <div class="yourmsg">
                     Select friend from OtherChats Option.
-                    <div class="time">
-                        10:30
-                    </div>
                 </div>
             </div>
         </div>
@@ -586,11 +585,12 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
             var chatPanel = document.getElementById('chatPanel');
             sessionStorage.removeItem('user2');
             sessionStorage.removeItem('tn');
-            localStorage.removeItem('user2');
-            localStorage.removeItem('tn');
             //chatPanel.innerHTML = "";
 
-
+            document.getElementById('avatar').addEventListener('click',function(){
+                document.getElementById('secret').style.display = 'block';
+                document.getElementsByClassName('fa fa-paper-plane')[0].style.display="none";
+            })
 
 
             window.addEventListener('keydown', function(e) {
