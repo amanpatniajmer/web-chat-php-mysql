@@ -47,7 +47,21 @@ switch ($_POST['submit']) {
         if (!(isset($_COOKIE['authorize'])) or ($_COOKIE['authorize'] == false)) {
             echo "Invalid User";
         }
+        else{
+            $status=$_POST['status'];
+            $username=$_POST['username'];
+            $query="UPDATE users SET status=$status WHERE username='$username'";
+            $result=mysqli_query($db,$query);
+        }
         break;
+    case 'logout':
+        setcookie('authorize');
+        $username=$_POST['username'];
+        $query="UPDATE users SET status=0 WHERE username='$username'";
+        if($result=mysqli_query($db,$query)){
+            echo $result;
+        }
+    break;
     case 'SignUp':
         if(preg_match_all("/([\"'();])/",trim($_POST['username']))){
             echo "Special characters are not allowed.";

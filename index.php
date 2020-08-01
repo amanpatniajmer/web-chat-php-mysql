@@ -37,7 +37,7 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
         background-color: white;
         color: white;
         max-height: 100vh;
-
+        position: relative;
         border-radius: 0px 0px 15px 15px;
     }
 
@@ -58,6 +58,7 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
         flex-flow: column;
         padding: 5px;
         overflow: auto;
+        position: relative;
     }
 
     #input_div {
@@ -102,7 +103,7 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
     .msg {
         width: 100%;
         display: flex;
-        flex-flow: column;
+        flex-direction: column;
     }
 
     .mymsg {
@@ -152,7 +153,7 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
         border-radius: 100%;
         outline: none;
         border: none;
-        background-color: rgba(0,0,0,0);
+        background-color: rgba(0, 0, 0, 0);
     }
 
     #secret {
@@ -161,6 +162,7 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
         height: 100vh;
         width: 100vw;
         position: fixed;
+        z-index: 10000;
     }
 
     .options {
@@ -190,12 +192,17 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
     }
 
     .modal {
-        display: none;
+        visibility: hidden;
         width: 100vw;
         height: 100vh;
         position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
         background-color: rgba(0, 0, 0, 0.33);
         text-align: center;
+        z-index: 1000;
     }
 
     .modal-content {
@@ -223,7 +230,6 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
 
     .list {
         border: #ececec solid 1px;
-        position: relative;
     }
 
     .listOptions {
@@ -324,23 +330,55 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
         color: #270;
         background-color: #DFF2BF;
     }
-    #scroller{
-        display: block;
-        float: left;
-        bottom:0px;
-        color:green;
+
+    #scroller {
+        float: right;
+        position: relative;
+        bottom: 110px;
+        color: green;
         background-color: white;
         padding: 8px;
-        margin-right: 5px;
-        align-self: flex-end;
-        margin-bottom: 5px !important;
+        margin-bottom: 5px;
+        right: 8px;
         border-radius: 100%;
         box-shadow: -3px 3px 3px 1px rgba(0, 0, 0, 0.69);
+        z-index: 500;
+    }
+
+    #scroller_div {
+        visibility: hidden;
+    }
+
+    #status_icon {
+        border-radius: 100%;
+        box-shadow: -3px 3px 3px 1px rgba(0, 0, 0, 0.69);
+    }
+
+    #status_div {
+        /* background-color: rgb(80 47 152); */
+        color: white;
+        border: none;
+        padding: 0px;
+        font-size:12px;
+        /* border-radius: 15px 15px 15px 15px; */
+        /* box-shadow: -2px 2px 1px 3px rgb(0 0 0 / 14%); */
+    }
+
+    .date {
+        padding: 2px;
+        width: 50px;
+        align-self: center;
+        background-color: rgb(225, 243, 251);
+        display: inline-block;
+        color: black;
+        text-align: center;
+        box-shadow: 5px 8px 6px 1px rgba(0, 0, 0, 0.33);
+        border-radius: 8px;
     }
 </style>
 
 <body>
-<div id="scroller_div"><i class="fa fa-hand-o-down fa-2x" id="scroller"></i></div>
+
     <div class="modal" id="otherChats_div">
         <div class="modal-content" id="otherChats-content">
             <br />
@@ -369,27 +407,36 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
         <div class="header">
             <i class=" fa fa-user-circle fa-2x" id="avatar"></i>
             <span class="user2">User2</span>
+            <span id="status_div">
+                <i id="status_icon" class="fa fa-eercast offline"></i>
+                <span class="status" id="status">Status</span>
+            </span>
             <button id="otherChats" class="options"> Other Chats</button>
         </div>
         <div id="chatPanel">
             <br /><br /><br /><br />
+            <div class="msg">
+                <div class="date">
+                    Today
+                </div>
+            </div>
             <div class="msg">
                 <div class="yourmsg">
                     Select friend from OtherChats Option.
                 </div>
             </div>
         </div>
-        
+
         <div id="input_div">
             <form id="msg_form" method="POST" action="./send.php">
-            <!-- <div>
+                <!-- <div>
                 <button name="link" id="link"><i class="fa fa-link"></i></button>
             </div> -->
                 <textarea name="msg" id="msg" autofocus autocomplete="off" placeholder="Type your msg"></textarea>
                 <button type="submit" name="submit" id="send" value="Send"><i class="fa fa-paper-plane"></i></button>
             </form>
         </div>
-
+        <div id="scroller_div"><i class="fa fa-hand-o-down fa-2x" id="scroller"></i></div>
     </div>
     <script>
         function retrieve_list() {
@@ -435,7 +482,7 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
                 xhr.onreadystatechange = function() {
                     if (xhr.status >= 200 & xhr.status < 300 & xhr.readyState == 4) {
                         resolve(xhr);
-                        console.log(xhr.responseText);
+                        //console.log(xhr.responseText);
                     }
                 }
                 xhr.open('post', './table_name.php');
@@ -448,6 +495,7 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
             return new Promise(function(resolve) {
                 var formdata = new FormData();
                 formdata.append('table_name', tn);
+                formdata.append('username', sessionStorage.getItem('user2'));
                 formdata.append('submit', 'initial');
                 xhr.onreadystatechange = function() {
                     if (xhr.status >= 200 & xhr.status < 300 & xhr.readyState == 4) {
@@ -475,59 +523,84 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
             new_msg.append(new_mymsg);
             return new_msg;
         }
-        function partial_load(){
-                var xhr = new XMLHttpRequest();
-                var formdata = new FormData();
-                var d=new Date(sessionStorage.getItem('llt'));
-                formdata.append('table_name', sessionStorage.getItem('tn'));
-                formdata.append('from_user', localStorage.getItem('username'));
-                formdata.append('to_user', sessionStorage.getItem('user2'));
-                formdata.append('day', d.getDate());
-                formdata.append('month', eval(d.getMonth() + 1));
-                formdata.append('year', d.getFullYear());
-                formdata.append('h', d.getHours());
-                formdata.append('m', d.getMinutes());
-                formdata.append('s', d.getSeconds());
-                formdata.append('submit', 'partial');
-                return new Promise(function(resolve, reject) {
-                    xhr.onreadystatechange = function() {
-                        if (xhr.status >= 200 & xhr.status < 300) {
-                            resolve(xhr);
-                            console.log(xhr.responseText);
-                        }
+
+        function partial_load() {
+            var xhr = new XMLHttpRequest();
+            var formdata = new FormData();
+            var d = new Date(sessionStorage.getItem('llt'));
+            formdata.append('table_name', sessionStorage.getItem('tn'));
+            formdata.append('username', sessionStorage.getItem('user2'));
+            formdata.append('day', d.getDate());
+            formdata.append('month', eval(d.getMonth() + 1));
+            formdata.append('year', d.getFullYear());
+            formdata.append('h', d.getHours());
+            formdata.append('m', d.getMinutes());
+            formdata.append('s', d.getSeconds());
+            formdata.append('id', sessionStorage.getItem('llid'));
+            formdata.append('submit', 'partial');
+            return new Promise(function(resolve, reject) {
+                xhr.onreadystatechange = function() {
+                    if (xhr.status >= 200 & xhr.status < 300 & xhr.readyState == 4) {
+                        resolve(xhr);
+                        //console.log(xhr.responseText);
                     }
-                    xhr.open('post', './load_msgs.php');
-                    xhr.send(formdata);
-                })
-            }
+                }
+                xhr.open('post', './load_msgs.php');
+                xhr.send(formdata);
+            })
+        }
+
         function load() {
             table_name().then(function(x) {
                 var json = JSON.parse(x.responseText);
                 sessionStorage.setItem('tn', json['table_name']);
-                if(0 & sessionStorage.getItem('llt')){
-                    sessionStorage.setItem('llt',new Date());
-                    partial_load();
-                }
-                else{
-                load_msgs(json['table_name']).then(function(xhr) {
-                    var json_msgs = JSON.parse(xhr.responseText);
-                
-                    if(chatPanel.scrollHeight- chatPanel.clientHeight - chatPanel.scrollTop<110)
-                    sessionStorage.setItem('load',1);
-                    //one message of 48.6 height
-                    chatPanel.innerHTML = "";
-                    
-                    for (var i = 0; i < json_msgs.length; i++) {
-                        chatPanel.append(make_msg(json_msgs[i].from_user, json_msgs[i].to_user, json_msgs[i].msg, json_msgs[i].year, json_msgs[i].month, json_msgs[i].day, json_msgs[i].hour, json_msgs[i].min, json_msgs[i].sec));
-                        if(sessionStorage.getItem('load')==1) {
-                            chatPanel.scrollTop = chatPanel.scrollHeight;
-                        }
-                    }
-                    sessionStorage.removeItem('load');
-                })
-            }
-            });
+                var json_msgs;
+                if (sessionStorage.getItem('llid')) {
+                    partial_load().then(function(xhr) {
 
+                        json_msgs = JSON.parse(xhr.responseText);
+                        append_msgs(json_msgs);
+                    })
+                } else {
+
+                    load_msgs(json['table_name']).then(function(xhr) {
+                        json_msgs = JSON.parse(xhr.responseText);
+                        append_msgs(json_msgs);
+                    })
+                }
+            });
+        }
+
+        function append_msgs(json_msgs) {
+            //console.log(json_msgs.length);
+            //console.log(new Date(Date.parse(json_msgs[0])));
+            /* console.log(new Date(Date.parse(json_msgs[0])).getMilliseconds()); */
+            /* sessionStorage.setItem('llt', new Date(Date.parse(json_msgs[0]))); */
+            if (json_msgs[0].status == 1) {
+                document.getElementById('status_icon').style.color = "yellowgreen";
+                document.getElementById('status').innerText = "Online";
+            } else {
+                document.getElementById('status_icon').style.color = "red";
+                document.getElementById('status').innerText = "Offline";
+            }
+            if (chatPanel.scrollHeight - chatPanel.clientHeight - chatPanel.scrollTop < 110) {
+                sessionStorage.setItem('load', 1);
+            } else {
+                if (json_msgs.length > 1) {
+                    //alert('hey');
+                    document.getElementById('scroller_div').style.visibility = "visible";
+                }
+            }
+            //if(!sessionStorage.getItem('llt')) 
+            //one message of 48.6 height
+            for (var i = 1; i < json_msgs.length; i++) {
+                chatPanel.append(make_msg(json_msgs[i].from_user, json_msgs[i].to_user, json_msgs[i].msg, json_msgs[i].year, json_msgs[i].month, json_msgs[i].day, json_msgs[i].hour, json_msgs[i].min, json_msgs[i].sec));
+                sessionStorage.setItem('llid',json_msgs[i].id);
+                if (sessionStorage.getItem('load') == 1) {
+                    chatPanel.scrollTop = chatPanel.scrollHeight;
+                }
+            }
+            sessionStorage.removeItem('load');
         }
 
         function load_list() {
@@ -538,6 +611,7 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
             }).then(function() {
                 Array.from(document.getElementsByClassName('listOptions')).forEach(function(element) {
                     element.addEventListener('click', function(e) {
+                        sessionStorage.removeItem('llid');
                         var user2 = element.lastElementChild.innerText;
                         sessionStorage.setItem('user2', user2);
                         Array.from(document.getElementById('list').children).forEach(function(el) {
@@ -545,10 +619,11 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
                                 el.className = "listOptions";
                             } else {
                                 element.classList.add('selected');
+                                chatPanel.innerHTML="";
                             }
                         })
                         load();
-                        modal.style.display = "none";
+                        modal.style.visibility = "hidden";
                         Array.from(document.getElementsByClassName('user2')).forEach(function(element) {
                             element.innerHTML = sessionStorage.getItem('user2');
                         })
@@ -590,13 +665,13 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
                         console.log(xhr.responseText);
                         if (xhr.responseText == "success") {
                             a.className = "success-msg";
-                            a.childNodes[2].nodeValue="Successfully added friend.";
+                            a.childNodes[2].nodeValue = "Successfully added friend.";
                             a.childNodes[1].className = "fa fa-check";
                             load_list();
                         } else {
                             a.className = "error-msg";
                             a.childNodes[1].className = "fa fa-times-circle";
-                            a.childNodes[2].nodeValue=xhr.responseText;
+                            a.childNodes[2].nodeValue = xhr.responseText;
                         }
                         setTimeout(function() {
                             a.style.display = "none";
@@ -612,37 +687,41 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
         var modal = document.getElementById('otherChats_div');
         window.addEventListener('click', function(e) {
             if (e.target == modal)
-                modal.style.display = "none";
+                //modal.style.display = "none";
+                modal.style.visibility = "hidden";
         })
         document.getElementById('close').addEventListener('click', function() {
 
             document.getElementById('list').style.animation = "up 300ms ease"
             document.getElementById('list').style.height = "0px";
             setTimeout(function() {
-                document.getElementById('otherChats_div').style.display = 'none';
+                //document.getElementById('otherChats_div').style.display = 'none';
+                modal.style.visibility = "hidden";
             }, 300);
         })
         document.getElementById('otherChats').addEventListener('click', function() {
             var od = document.getElementById('otherChats_div');
-            od.style.display = 'block';
+            //modal.style.display = 'block';
+            modal.style.visibility = "visible";
             document.getElementById('list').style.animation = "down 500ms ease";
             document.getElementById('list').style.height = "300px";
 
         })
         window.onload = function() {
             var chatPanel = document.getElementById('chatPanel');
-            document.getElementById('scroller_div').addEventListener('click',function(){
-                chatPanel.scrollTop=chatPanel.scrollHeight;
-                document.getElementById('scroller_div').style.display="none";
+            document.getElementById('scroller_div').addEventListener('click', function() {
+                chatPanel.scrollTop = chatPanel.scrollHeight;
+                document.getElementById('scroller_div').style.visibility = "hidden";
             })
             sessionStorage.removeItem('user2');
             sessionStorage.removeItem('tn');
-            sessionStorage.setItem('load',1);
+            sessionStorage.removeItem('llid');
+            sessionStorage.setItem('load', 1);
             //chatPanel.innerHTML = "";
 
-            document.getElementById('avatar').addEventListener('click',function(){
+            document.getElementById('avatar').addEventListener('click', function() {
                 document.getElementById('secret').style.display = 'block';
-                document.getElementsByClassName('fa fa-paper-plane')[0].style.display="none";
+                document.getElementsByClassName('fa fa-paper-plane')[0].style.display = "none";
             })
 
 
@@ -650,11 +729,11 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
                 if (e.which == "17" || e.key == "17") {
                     sessionStorage.setItem('secret', 1);
                     document.getElementById('secret').style.display = 'block';
-                    document.getElementsByClassName('fa fa-paper-plane')[0].style.display="none";
+                    document.getElementsByClassName('fa fa-paper-plane')[0].style.display = "none";
                 } else if (e.which == 16) {
                     sessionStorage.setItem('secret', 0);
                     document.getElementById('secret').style.display = 'none';
-                    document.getElementsByClassName('fa fa-paper-plane')[0].style.display="block";
+                    document.getElementsByClassName('fa fa-paper-plane')[0].style.display = "block";
                 } else if (e.which == 13 && e.shiftKey == false) {
                     var ta = document.getElementById('msg');
                     if (e.target == ta) {
@@ -669,16 +748,7 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
                 });
                 window.dispatchEvent(evt);
             }
-
-
-
-
             load_list();
-
-
-
-
-
             Array.from(document.getElementsByClassName('name')).forEach(function(element) {
                 element.innerHTML = localStorage.getItem('name');
             })
@@ -736,6 +806,10 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
                     alert('Please select a friend to chat from Other Chats');
                 } else {
                     var d = new Date();
+                    document.getElementById('msg').disabled="true";
+                    setTimeout(function(){
+                        document.getElementById('msg').removeAttribute('disabled');
+                    },1000);
                     chatPanel.append(make_msg(localStorage.getItem('username'), sessionStorage.getItem('user2'), msg, d.getFullYear(), eval(d.getMonth() + 1), d.getDate(), d.getHours(), d.getMinutes(), d.getSeconds()));
                     chatPanel.scrollTop = chatPanel.scrollHeight;
                     send_msg(msg, d).then(function() {
@@ -760,13 +834,17 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
                     }
                 })
 
-            }, 3000);
+            }, 1000);
 
             function authenticate() {
                 var xhr = new XMLHttpRequest();
                 return new Promise(function(resolve) {
                     var formdata = new FormData();
                     formdata.append('submit', 'check');
+                    formdata.append('username', localStorage.getItem('username'));
+                    if (document.hasFocus())
+                        formdata.append('status', 1);
+                    else formdata.append('status', 0);
                     xhr.onreadystatechange = function() {
                         if (xhr.status >= 200 & xhr.status < 300 & xhr.readyState == 4) {
                             resolve(xhr);

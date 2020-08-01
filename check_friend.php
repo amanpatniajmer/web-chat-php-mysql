@@ -39,7 +39,7 @@ else{
     if($result=mysqli_query($db,$query)){
         while($row=mysqli_fetch_assoc($result))
         $id=$row['id'];
-    $query="CREATE TABLE chat".$id." ( from_user VARCHAR(25) NOT NULL , to_user VARCHAR(25) NOT NULL , msg VARCHAR(1500) NOT NULL , year INT(4) NOT NULL , month INT(2) NOT NULL , day INT(2) NOT NULL , hour INT(2) NOT NULL , min INT(2) NOT NULL , sec INT(2) NOT NULL )";
+    $query="CREATE TABLE chat".$id." (id INT NOT NULL AUTO_INCREMENT, from_user VARCHAR(25) NOT NULL , to_user VARCHAR(25) NOT NULL , msg VARCHAR(1500) NOT NULL , year INT(4) NOT NULL , month INT(2) NOT NULL , day INT(2) NOT NULL , hour INT(2) NOT NULL , min INT(2) NOT NULL , sec INT(2) NOT NULL )";
     if($result=mysqli_query($db,$query)){
         echo "success";    
     }
