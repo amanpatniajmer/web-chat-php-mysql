@@ -1,11 +1,7 @@
 <?php
 session_start();
 if (isset($_COOKIE['authorize'])) {
-    if ($_COOKIE['authorize'] == true)
         header("location: index.php");
-    else {
-        echo "cookie";
-    }
 } else {
     echo "Please LogIn";
 }
@@ -74,7 +70,7 @@ if (isset($_COOKIE['authorize'])) {
 
 <body>
     <h1 class="center">Login into App</h1>
-    <form id="login_form" action="validate_login.php" method="post">
+    <form id="login_form" action="./support/validate_login.php" method="post">
         <label>Username:
             <input id="username" name="username" type="text" required />
         </label>
@@ -140,7 +136,7 @@ if (isset($_COOKIE['authorize'])) {
 
                     }
                 }
-                xhr.open('post', './validate_login.php');
+                xhr.open('post', './support/validate_login.php');
                 xhr.send(formdata);
             })
         }

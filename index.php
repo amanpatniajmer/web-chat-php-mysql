@@ -1,6 +1,6 @@
 <?php
 session_start();
-if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
+if (!isset($_COOKIE['authorize']) or $_COOKIE['authorize']==-10) {
     header("location: login.php");
 }
 ?>
@@ -10,15 +10,14 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Web Chat</title>
     <link rel="manifest" href="./manifest.json">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
 </head>
 <style>
     * {
         font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-        word-wrap: break-word;
-        word-break: break-all;
+        text-align: justify;
     }
 
     h1,
@@ -108,7 +107,7 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
 
     .mymsg {
         color: black;
-        max-width: 85%;
+        max-width: 80%;
         display: flex;
         flex-flow: column;
         align-self: flex-end;
@@ -120,7 +119,7 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
     }
 
     .yourmsg {
-        max-width: 85%;
+        max-width: 80%;
         display: flex;
         flex-flow: column;
         align-self: flex-start;
@@ -359,7 +358,7 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
         color: white;
         border: none;
         padding: 0px;
-        font-size:12px;
+        font-size: 12px;
         /* border-radius: 15px 15px 15px 15px; */
         /* box-shadow: -2px 2px 1px 3px rgb(0 0 0 / 14%); */
     }
@@ -374,6 +373,12 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
         text-align: center;
         box-shadow: 5px 8px 6px 1px rgba(0, 0, 0, 0.33);
         border-radius: 8px;
+    }
+
+    @media only screen and (max-width: 385px) {
+        #status {
+            visibility: hidden;
+        }
     }
 </style>
 
@@ -428,7 +433,7 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
         </div>
 
         <div id="input_div">
-            <form id="msg_form" method="POST" action="./send.php">
+            <form id="msg_form" method="POST" action="./support/send.php">
                 <!-- <div>
                 <button name="link" id="link"><i class="fa fa-link"></i></button>
             </div> -->
@@ -439,16 +444,19 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
         <div id="scroller_div"><i class="fa fa-hand-o-down fa-2x" id="scroller"></i></div>
     </div>
     <script>
+        var counter = 0;
+        var prevloaded;
+
         function retrieve_list() {
             var xhr = new XMLHttpRequest();
             return new Promise(function(resolve) {
                 xhr.onreadystatechange = function() {
                     if (xhr.status >= 200 & xhr.status < 300 & xhr.readyState == 4) {
                         resolve(xhr);
-                        console.log(xhr.responseText);
+                        //console.log(xhr.responseText);
                     }
                 }
-                xhr.open('post', './load_list.php');
+                xhr.open('post', './support/load_list.php');
                 var formdata = new FormData();
                 formdata.append('username', localStorage.getItem('username'));
                 xhr.send(formdata);
@@ -485,7 +493,7 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
                         //console.log(xhr.responseText);
                     }
                 }
-                xhr.open('post', './table_name.php');
+                xhr.open('post', './support/table_name.php');
                 xhr.send(formdata);
             })
         }
@@ -503,7 +511,7 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
                         //console.log(xhr.responseText);
                     }
                 }
-                xhr.open('post', './load_msgs.php');
+                xhr.open('post', './support/load_msgs.php');
                 xhr.send(formdata);
             })
         }
@@ -542,40 +550,15 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
                 xhr.onreadystatechange = function() {
                     if (xhr.status >= 200 & xhr.status < 300 & xhr.readyState == 4) {
                         resolve(xhr);
-                        //console.log(xhr.responseText);
+                        //console.log("Partial:" + xhr.responseText);
                     }
                 }
-                xhr.open('post', './load_msgs.php');
+                xhr.open('post', './support/load_msgs.php');
                 xhr.send(formdata);
             })
         }
 
-        function load() {
-            table_name().then(function(x) {
-                var json = JSON.parse(x.responseText);
-                sessionStorage.setItem('tn', json['table_name']);
-                var json_msgs;
-                if (sessionStorage.getItem('llid')) {
-                    partial_load().then(function(xhr) {
-
-                        json_msgs = JSON.parse(xhr.responseText);
-                        append_msgs(json_msgs);
-                    })
-                } else {
-
-                    load_msgs(json['table_name']).then(function(xhr) {
-                        json_msgs = JSON.parse(xhr.responseText);
-                        append_msgs(json_msgs);
-                    })
-                }
-            });
-        }
-
-        function append_msgs(json_msgs) {
-            //console.log(json_msgs.length);
-            //console.log(new Date(Date.parse(json_msgs[0])));
-            /* console.log(new Date(Date.parse(json_msgs[0])).getMilliseconds()); */
-            /* sessionStorage.setItem('llt', new Date(Date.parse(json_msgs[0]))); */
+        function update_status(json_msgs) {
             if (json_msgs[0].status == 1) {
                 document.getElementById('status_icon').style.color = "yellowgreen";
                 document.getElementById('status').innerText = "Online";
@@ -583,6 +566,43 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
                 document.getElementById('status_icon').style.color = "red";
                 document.getElementById('status').innerText = "Offline";
             }
+        }
+
+        function load() {
+            table_name().then(function(x) {
+                var json = JSON.parse(x.responseText);
+                sessionStorage.setItem('tn', json['table_name']);
+                var json_msgs;
+                //console.log(counter);
+                if (counter != 0) {
+                    if (prevloaded == 1) {
+                        prevloaded = 0;
+                        partial_load().then(function(xhr) {
+                            json_msgs = JSON.parse(xhr.responseText);
+                            update_status(json_msgs);
+                            if (json_msgs.length > 1) sessionStorage.setItem('llid', json_msgs[json_msgs.length - 1].id);
+                            append_msgs(json_msgs);
+                            prevloaded = 1;
+                        })
+                    }
+                } else {
+                    counter++;
+                    load_msgs(json['table_name']).then(function(xhr) {
+                        json_msgs = JSON.parse(xhr.responseText);
+                        update_status(json_msgs);
+                        if (json_msgs.length > 1) sessionStorage.setItem('llid', json_msgs[json_msgs.length - 1].id);
+                        append_msgs(json_msgs);
+                        prevloaded = 1;
+                    })
+                }
+            });
+        }
+
+        function append_msgs(json_msgs) {
+            //console.log(json_msgs);
+            //console.log(new Date(Date.parse(json_msgs[0])));
+            /* console.log(new Date(Date.parse(json_msgs[0])).getMilliseconds()); */
+            /* sessionStorage.setItem('llt', new Date(Date.parse(json_msgs[0]))); */
             if (chatPanel.scrollHeight - chatPanel.clientHeight - chatPanel.scrollTop < 110) {
                 sessionStorage.setItem('load', 1);
             } else {
@@ -595,41 +615,65 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
             //one message of 48.6 height
             for (var i = 1; i < json_msgs.length; i++) {
                 chatPanel.append(make_msg(json_msgs[i].from_user, json_msgs[i].to_user, json_msgs[i].msg, json_msgs[i].year, json_msgs[i].month, json_msgs[i].day, json_msgs[i].hour, json_msgs[i].min, json_msgs[i].sec));
-                sessionStorage.setItem('llid',json_msgs[i].id);
                 if (sessionStorage.getItem('load') == 1) {
                     chatPanel.scrollTop = chatPanel.scrollHeight;
                 }
             }
             sessionStorage.removeItem('load');
         }
-
+        function authenticate() {
+                var xhr = new XMLHttpRequest();
+                return new Promise(function(resolve) {
+                    var formdata = new FormData();
+                    formdata.append('submit', 'check');
+                    formdata.append('username', localStorage.getItem('username'));
+                    if (document.hasFocus()) {
+                        formdata.append('status', 1);
+                    } else formdata.append('status', 0);
+                    xhr.onreadystatechange = function() {
+                        if (xhr.status >= 200 & xhr.status < 300 & xhr.readyState == 4) {
+                            resolve(xhr);
+                            //console.log(xhr.responseText);
+                        }
+                    }
+                    xhr.open('post', './support/validate_login.php');
+                    xhr.send(formdata);
+                })
+            }
         function load_list() {
             document.getElementById('list').innerHTML = "";
             document.getElementById('list').innerText = "";
-            retrieve_list().then(function(x) {
-                make_list(x.responseText)
-            }).then(function() {
-                Array.from(document.getElementsByClassName('listOptions')).forEach(function(element) {
-                    element.addEventListener('click', function(e) {
-                        sessionStorage.removeItem('llid');
-                        var user2 = element.lastElementChild.innerText;
-                        sessionStorage.setItem('user2', user2);
-                        Array.from(document.getElementById('list').children).forEach(function(el) {
-                            if (el.lastElementChild.innerText != sessionStorage.getItem('user2')) {
-                                el.className = "listOptions";
-                            } else {
-                                element.classList.add('selected');
-                                chatPanel.innerHTML="";
-                            }
+            authenticate().then(function(xhr) {
+                if (xhr.responseText == "Invalid User") {
+                    window.location.href = "login.php";
+                } else {
+                    retrieve_list().then(function(x) {
+                        make_list(x.responseText)
+                    }).then(function() {
+                        Array.from(document.getElementsByClassName('listOptions')).forEach(function(element) {
+                            element.addEventListener('click', function(e) {
+                                counter = 0;
+                                var user2 = element.lastElementChild.innerText;
+                                sessionStorage.setItem('user2', user2);
+                                Array.from(document.getElementById('list').children).forEach(function(el) {
+                                    if (el.lastElementChild.innerText != sessionStorage.getItem('user2')) {
+                                        el.className = "listOptions";
+                                    } else {
+                                        element.classList.add('selected');
+                                        chatPanel.innerHTML = "";
+                                    }
+                                })
+                                sessionStorage.removeItem('llid');
+                                load();
+                                modal.style.visibility = "hidden";
+                                Array.from(document.getElementsByClassName('user2')).forEach(function(element) {
+                                    element.innerHTML = sessionStorage.getItem('user2');
+                                })
+                            })
                         })
-                        load();
-                        modal.style.visibility = "hidden";
-                        Array.from(document.getElementsByClassName('user2')).forEach(function(element) {
-                            element.innerHTML = sessionStorage.getItem('user2');
-                        })
-                    })
-                })
-            });
+                    });
+                }
+            })
         }
 
         function toggle_add() {
@@ -662,7 +706,7 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
                         resolve(xhr);
                         var a = document.getElementById('info_add_user');
                         a.style.display = "block";
-                        console.log(xhr.responseText);
+                        //console.log(xhr.responseText);
                         if (xhr.responseText == "success") {
                             a.className = "success-msg";
                             a.childNodes[2].nodeValue = "Successfully added friend.";
@@ -678,7 +722,7 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
                         }, 5000);
                     }
                 }
-                xhr.open('post', './check_friend.php');
+                xhr.open('post', './support/check_friend.php');
                 xhr.send(formdata);
             })
         }
@@ -700,6 +744,7 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
             }, 300);
         })
         document.getElementById('otherChats').addEventListener('click', function() {
+            load_list();
             var od = document.getElementById('otherChats_div');
             //modal.style.display = 'block';
             modal.style.visibility = "visible";
@@ -707,7 +752,37 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
             document.getElementById('list').style.height = "300px";
 
         })
+        if ('serviceWorker' in window.navigator) {
+            //console.log('a');
+            /* window.addEventListener('load',function(){
+                window.navigator.serviceWorker.register('./sw.js')
+                .then(function(){console.log('Successfully registered')})
+                .catch(function(){console.log('Error!')})
+            }) */
+
+        }
         window.onload = function() {
+
+
+            /* var deferredPrompt;
+            var btnAdd = document.getElementById('btnAdd');
+            window.addEventListener('beforeinstallprompt', e => {
+                e.preventDefault();
+                console.log("Before install trigerred");
+                deferredPrompt = e;
+                btnAdd.style.display = "block";
+            });
+
+            btnAdd.addEventListener("click", (e) => {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log("User accepted the prompt");
+                        btnAdd.style.display="none";
+                    }
+                    deferredPrompt = null;
+                })
+            }); */
             var chatPanel = document.getElementById('chatPanel');
             document.getElementById('scroller_div').addEventListener('click', function() {
                 chatPanel.scrollTop = chatPanel.scrollHeight;
@@ -788,7 +863,7 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
                             //console.log(xhr.responseText);
                         }
                     }
-                    xhr.open('post', './send.php');
+                    xhr.open('post', './support/send.php');
                     xhr.send(formdata);
                 })
             }
@@ -806,14 +881,9 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
                     alert('Please select a friend to chat from Other Chats');
                 } else {
                     var d = new Date();
-                    document.getElementById('msg').disabled="true";
-                    setTimeout(function(){
-                        document.getElementById('msg').removeAttribute('disabled');
-                    },1000);
                     chatPanel.append(make_msg(localStorage.getItem('username'), sessionStorage.getItem('user2'), msg, d.getFullYear(), eval(d.getMonth() + 1), d.getDate(), d.getHours(), d.getMinutes(), d.getSeconds()));
                     chatPanel.scrollTop = chatPanel.scrollHeight;
                     send_msg(msg, d).then(function() {
-                        document.getElementById('msg').value = '';
                         document.getElementById('msg').setAttribute('placeholder', 'Type your msg');
                         //load_msgs();
                     })
@@ -821,6 +891,8 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
             })
             var form = document.getElementById('msg_form');
             form.onsubmit = function() {
+                document.getElementById('msg').value = '';
+                form.reset();
                 return false;
             }
             setInterval(function() {
@@ -834,27 +906,7 @@ if (!isset($_COOKIE['authorize']) or !($_COOKIE['authorize'] == true)) {
                     }
                 })
 
-            }, 1000);
-
-            function authenticate() {
-                var xhr = new XMLHttpRequest();
-                return new Promise(function(resolve) {
-                    var formdata = new FormData();
-                    formdata.append('submit', 'check');
-                    formdata.append('username', localStorage.getItem('username'));
-                    if (document.hasFocus())
-                        formdata.append('status', 1);
-                    else formdata.append('status', 0);
-                    xhr.onreadystatechange = function() {
-                        if (xhr.status >= 200 & xhr.status < 300 & xhr.readyState == 4) {
-                            resolve(xhr);
-                            console.log(xhr.responseText);
-                        }
-                    }
-                    xhr.open('post', './validate_login.php');
-                    xhr.send(formdata);
-                })
-            }
+            }, 3000);
         }
     </script>
 </body>

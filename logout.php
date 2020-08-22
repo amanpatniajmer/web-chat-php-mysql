@@ -24,11 +24,12 @@
                     xhr.onreadystatechange = function() {
                         if (xhr.status >= 200 & xhr.status < 300 & xhr.readyState == 4) {
                             resolve(xhr);
-                            if(xhr.responseText)
+                            if(xhr.responseText){
                                 window.location.href="./login.php";
+                            }
                         }
                     }
-                    xhr.open('post', './validate_login.php');
+                    xhr.open('post', './support/validate_login.php');
                     xhr.send(formdata);
         })
         }
